@@ -1,0 +1,22 @@
+cmake_minimum_required(VERSION 3.22.1)
+project(logic_solver)
+set(CMAKE_CXX_STANDARD 23)
+
+include_directories(src)
+add_executable(${PROJECT_NAME}
+        src/Propositions/Variable.h
+        src/Propositions/Variable.cpp
+        src/Propositions/BinaryOperations/BinaryOperation.h
+        src/Propositions/BinaryOperations/Conjunction.h
+        src/Propositions/BinaryOperations/Conjunction.cpp
+        src/Propositions/BinaryOperations/Disjunction.h
+        src/Propositions/BinaryOperations/Disjunction.cpp
+        src/Propositions/Negation.h
+        src/Propositions/Negation.cpp
+        src/Propositions/WellFormedFormula.h
+        src/Propositions/BinaryOperations/Implication.h
+        src/Propositions/BinaryOperations/Implication.cpp
+        src/Propositions/BinaryOperations/Equivalence.h
+        src/Propositions/BinaryOperations/Equivalence.cpp
+        src/Propositions/BinaryOperations/BinaryOperation.cpp
+        src/main.cpp)
