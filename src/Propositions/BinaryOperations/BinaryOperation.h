@@ -6,14 +6,18 @@
 
 class BinaryOperation : public WellFormedFormula {
 protected:
-    std::shared_ptr<WellFormedFormula> rightOperand;
-    std::shared_ptr<WellFormedFormula> leftOperand;
+    const std::shared_ptr<WellFormedFormula> rightOperand;
+    const std::shared_ptr<WellFormedFormula> leftOperand;
 
     [[nodiscard]] std::string getString(char operatorSymbol) const;
 
 public:
     BinaryOperation(std::shared_ptr<WellFormedFormula> leftOperand, std::shared_ptr<WellFormedFormula> rightOperand)
             : leftOperand(std::move(leftOperand)), rightOperand(std::move(rightOperand)) {}
+
+    [[nodiscard]] std::shared_ptr<WellFormedFormula> getLeftOperand() const;
+
+    [[nodiscard]] std::shared_ptr<WellFormedFormula> getRightOperand() const;
 };
 
 

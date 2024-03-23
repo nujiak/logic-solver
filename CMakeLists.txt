@@ -19,4 +19,8 @@ add_executable(${PROJECT_NAME}
         src/Propositions/BinaryOperations/Equivalence.h
         src/Propositions/BinaryOperations/Equivalence.cpp
         src/Propositions/BinaryOperations/BinaryOperation.cpp
-        src/main.cpp)
+        src/main.cpp
+        src/Rules/InferenceRules/ConjunctiveSyllogism.h
+        src/Rules/InferenceRules/ConjunctiveSyllogism.cpp
+        src/Rules/InferenceRules/IRule.h
+        src/Rules/InferenceRules/IRule.cpp)
