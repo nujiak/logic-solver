@@ -4,12 +4,19 @@ std::string Negation::getString() const {
     return "!" + this->operand->getString();
 }
 
-std::shared_ptr<WellFormedFormula> Negation::of(std::shared_ptr<WellFormedFormula> proposition) {
+std::shared_ptr<WellFormedFormula> Negation::of(const std::shared_ptr<WellFormedFormula> &proposition) {
     if (auto negation = std::dynamic_pointer_cast<Negation>(proposition)) {
         return negation->operand;
     } else {
         Negation newNegation{proposition};
         return std::make_shared<Negation>(newNegation);
     }
+}
+
+bool Negation::operator==(const std::shared_ptr<WellFormedFormula> &other) const {
+    if (auto otherNegation = std::dynamic_pointer_cast<Negation>(other)) {
+        return this->operand == otherNegation->operand;
+    }
+    return false;
 }
 

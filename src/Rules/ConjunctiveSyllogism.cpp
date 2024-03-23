@@ -1,0 +1,2 @@
+
+#include "ConjunctiveSyllogism.h"

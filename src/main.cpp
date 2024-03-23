@@ -17,7 +17,12 @@ int main() {
     auto implication = std::make_shared<Implication>(conj, disjunction);
     auto equivalence = std::make_shared<Equivalence>(A, implication);
     auto negation = Negation::of(equivalence);
+    auto conversedImplication = std::make_shared<Implication>(disjunction, conj);
+    auto flippedConjunction = std::make_shared<Conjunction>(B, A);
 
     std::cout << Negation::of(negation)->getString() << "\n";
     std::cout << negation->getString() << "\n";
+    std::cout << (*equivalence == Negation::of(negation)) << "\n";
+    std::cout << (*implication == conversedImplication) << "\n";
+    std::cout << (*conj == flippedConjunction) << "\n";
 }

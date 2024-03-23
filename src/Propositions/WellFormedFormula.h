@@ -8,6 +8,8 @@
 class WellFormedFormula {
 public:
     [[nodiscard]] virtual std::string getString() const = 0;
+
+    [[nodiscard]] virtual bool operator==(const std::shared_ptr<WellFormedFormula> &other) const = 0;
 };
 
 

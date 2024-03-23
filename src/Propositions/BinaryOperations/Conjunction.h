@@ -15,6 +15,7 @@ public:
 
     [[nodiscard]] std::string getString() const override;
 
+    [[nodiscard]] bool operator==(const std::shared_ptr<WellFormedFormula> &other) const override;
 };
 
 
