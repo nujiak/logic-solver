@@ -7,8 +7,11 @@
 class Negation : public WellFormedFormula {
 private:
     std::shared_ptr<WellFormedFormula> operand;
-public:
+
     explicit Negation(std::shared_ptr<WellFormedFormula> operand) : operand(std::move(operand)) {}
+
+public:
+    static std::shared_ptr<WellFormedFormula> of(std::shared_ptr<WellFormedFormula> proposition);
 
     [[nodiscard]] std::string getString() const override;
 };

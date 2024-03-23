@@ -16,7 +16,8 @@ int main() {
     auto disjunction = std::make_shared<Disjunction>(A, B);
     auto implication = std::make_shared<Implication>(conj, disjunction);
     auto equivalence = std::make_shared<Equivalence>(A, implication);
-    auto negation = std::make_shared<Negation>(equivalence);
+    auto negation = Negation::of(equivalence);
 
+    std::cout << Negation::of(negation)->getString() << "\n";
     std::cout << negation->getString() << "\n";
 }
