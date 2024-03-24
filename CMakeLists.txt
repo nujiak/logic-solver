@@ -23,4 +23,6 @@ add_executable(${PROJECT_NAME}
         src/Rules/InferenceRules/ConjunctiveSyllogism.h
         src/Rules/InferenceRules/ConjunctiveSyllogism.cpp
         src/Rules/InferenceRules/IRule.h
-        src/Rules/InferenceRules/IRule.cpp)
+        src/Rules/InferenceRules/IRule.cpp
+        src/Rules/InferenceRules/DisjunctiveSyllogism.h
+        src/Rules/InferenceRules/DisjunctiveSyllogism.cpp)

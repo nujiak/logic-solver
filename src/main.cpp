@@ -6,6 +6,7 @@
 #include "Propositions/BinaryOperations/Equivalence.h"
 #include "Propositions/Negation.h"
 #include "Rules/InferenceRules/ConjunctiveSyllogism.h"
+#include "Rules/InferenceRules/DisjunctiveSyllogism.h"
 #include <memory>
 #include <iostream>
 
@@ -34,4 +35,7 @@ int main() {
 
     std::cout << std::make_shared<ConjunctiveSyllogism>(negatedConjunction, B)->getString() << "\n";
     std::cout << std::make_shared<ConjunctiveSyllogism>(negatedConjunction, A)->getString() << "\n";
+
+    std::cout << std::make_shared<DisjunctiveSyllogism>(disjunction, Negation::of(A))->getString() << "\n";
+    std::cout << std::make_shared<DisjunctiveSyllogism>(disjunction, Negation::of(B))->getString() << "\n";
 }
