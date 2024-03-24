@@ -5,13 +5,19 @@
 #include <vector>
 #include "Statement.h"
 
+struct InferredProposition {
+    Rule rule;
+    std::shared_ptr<WellFormedFormula> proposition;
+};
+
 class Solver {
 private:
-    static std::optional<std::pair<std::shared_ptr<WellFormedFormula>, std::shared_ptr<WellFormedFormula>>>
+    static std::vector<InferredProposition>
     findSRule(const std::shared_ptr<WellFormedFormula> &proposition);
 
-    static std::vector<std::shared_ptr<WellFormedFormula>> findIRule(std::shared_ptr<WellFormedFormula> propositionA,
-                                                                     std::shared_ptr<WellFormedFormula> propositionB);
+    static std::vector<InferredProposition>
+    findIRule(const std::shared_ptr<WellFormedFormula> &propositionA,
+              const std::shared_ptr<WellFormedFormula> &propositionB);
 
     static void verifyInitialArgument(const std::vector<Statement> &argument);
 

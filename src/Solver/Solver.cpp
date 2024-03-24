@@ -1,24 +1,9 @@
 #include <iostream>
 #include "Solver.h"
-#include "Rules/SimplifyRules/And.h"
 #include "Propositions/Negation.h"
-#include "Propositions/BinaryOperations/Disjunction.h"
-#include "Propositions/BinaryOperations/Implication.h"
-#include "Propositions/BinaryOperations/Conjunction.h"
-#include "Rules/SimplifyRules/Nor.h"
-#include "Rules/SimplifyRules/Nif.h"
-#include "Rules/InferenceRules/ConjunctiveSyllogism.h"
-#include "Rules/InferenceRules/DisjunctiveSyllogism.h"
-#include "Rules/InferenceRules/ModusPonens.h"
-#include "Rules/InferenceRules/ModusTollens.h"
+#include "Rules/IRules.h"
+#include "Rules/SRules.h"
 
-std::shared_ptr<WellFormedFormula> getInnerProposition(const std::shared_ptr<WellFormedFormula>& proposition) {
-    if (auto inference = std::dynamic_pointer_cast<Inference>(proposition)) {
-        return inference->getProposition();
-    } else {
-        return proposition;
-    }
-}
 std::vector<Statement> Solver::solve(std::vector<Statement> argument) {
     bool isChanged = true;
     unsigned long startAt = 0;
@@ -44,18 +29,13 @@ std::vector<Statement> Solver::solve(std::vector<Statement> argument) {
             if (i >= startAt) {
                 std::cout << i << "*: " << leftStatement.getString() << "\n";
                 auto sRuleResult = findSRule(leftStatement.proposition);
-                if (sRuleResult.has_value()) {
-                    isChanged = true;
+                isChanged |= !sRuleResult.empty();
+                for (const auto &result: sRuleResult) {
                     argument.emplace_back(
                             StatementType::CONCLUSION,
-                            sRuleResult.value().first,
+                            result.proposition,
                             leftStatement.assumptionLevel,
-                            std::vector<unsigned long>{i}
-                    );
-                    argument.emplace_back(
-                            StatementType::CONCLUSION,
-                            sRuleResult.value().second,
-                            leftStatement.assumptionLevel,
+                            result.rule,
                             std::vector<unsigned long>{i}
                     );
                 }
@@ -88,8 +68,9 @@ std::vector<Statement> Solver::solve(std::vector<Statement> argument) {
                 for (const auto &proposition: iRuleResult) {
                     argument.emplace_back(
                             StatementType::CONCLUSION,
-                            proposition,
+                            proposition.proposition,
                             rightStatement.assumptionLevel,
+                            proposition.rule,
                             std::vector<unsigned long>{i, j}
                     );
                 }
@@ -99,8 +80,9 @@ std::vector<Statement> Solver::solve(std::vector<Statement> argument) {
                 for (const auto &proposition: reversedIRuleResult) {
                     argument.emplace_back(
                             StatementType::CONCLUSION,
-                            proposition,
+                            proposition.proposition,
                             rightStatement.assumptionLevel,
+                            proposition.rule,
                             std::vector<unsigned long>{i, j}
                     );
                 }
@@ -111,56 +93,47 @@ std::vector<Statement> Solver::solve(std::vector<Statement> argument) {
     return argument;
 }
 
-std::optional<std::pair<std::shared_ptr<WellFormedFormula>, std::shared_ptr<WellFormedFormula>>>
+std::vector<InferredProposition>
 Solver::findSRule(const std::shared_ptr<WellFormedFormula> &proposition) {
-    std::shared_ptr<WellFormedFormula> innerProposition = getInnerProposition(proposition);
-    if (auto conjunction = std::dynamic_pointer_cast<Conjunction>(innerProposition)) {
-        return And::from(conjunction);
-    }
-    if (auto negation = std::dynamic_pointer_cast<Negation>(innerProposition)) {
-        auto negatedProposition = Negation::of(innerProposition);
-        if (auto disjunction = std::dynamic_pointer_cast<Disjunction>(negatedProposition)) {
-            return Nor::from(negation);
-        }
-        if (auto implication = std::dynamic_pointer_cast<Implication>(
-                std::dynamic_pointer_cast<Negation>(innerProposition))) {
-            return Nif::from(negation);
+    std::vector<InferredProposition> out;
+    auto andResults = tryAndFrom(proposition);
+    if (!andResults.empty()) {
+        for (const auto &andResult: andResults) {
+            out.emplace_back(Rule::AND, andResult);
         }
     }
-    return {};
+    auto norResults = tryNorFrom(proposition);
+    if (!norResults.empty()) {
+        for (const auto &norResult: norResults) {
+            out.emplace_back(Rule::NOR, norResult);
+        }
+    }
+    auto nifResults = tryNifFrom(proposition);
+    if (!nifResults.empty()) {
+        for (const auto &nifResult: nifResults) {
+            out.emplace_back(Rule::NIF, nifResult);
+        }
+    }
+    return out;
 }
 
-std::vector<std::shared_ptr<WellFormedFormula>>
-Solver::findIRule(std::shared_ptr<WellFormedFormula> propositionA,
-                  std::shared_ptr<WellFormedFormula> propositionB) {
-    propositionA = getInnerProposition(propositionA);
-    propositionB = getInnerProposition(propositionB);
-    if (auto disjunction = std::dynamic_pointer_cast<Disjunction>(propositionA)) {
-        if ((*propositionB) == Negation::of(disjunction->getLeftOperand()) ||
-            (*propositionB) == Negation::of(disjunction->getRightOperand())) {
-            return {std::make_shared<DisjunctiveSyllogism>(disjunction, propositionB)};
-        }
-        return {};
+std::vector<InferredProposition>
+Solver::findIRule(const std::shared_ptr<WellFormedFormula> &propositionA,
+                  const std::shared_ptr<WellFormedFormula> &propositionB) {
+    std::vector<InferredProposition> out;
+    if (auto dsResult = tryDisjunctiveSyllogismFrom(propositionA, propositionB)) {
+        out.emplace_back(Rule::DS, dsResult);
     }
-    if (auto negation = std::dynamic_pointer_cast<Negation>(propositionA)) {
-        if (auto conjunction = std::dynamic_pointer_cast<Conjunction>(Negation::of(propositionA))) {
-            if ((*propositionB) == conjunction->getLeftOperand() || (*propositionB) == conjunction->getRightOperand()) {
-                return {std::make_shared<ConjunctiveSyllogism>(negation, propositionB)};
-            }
-        }
-        return {};
+    if (auto csResult = tryConjunctiveSyllogismFrom(propositionA, propositionB)) {
+        out.emplace_back(Rule::CS, csResult);
     }
-    if (auto implication = std::dynamic_pointer_cast<Implication>(propositionA)) {
-        std::vector<std::shared_ptr<WellFormedFormula>> out;
-        if ((*propositionB) == implication->getLeftOperand()) {
-            out.push_back(std::make_shared<ModusPonens>(implication, propositionB));
-        }
-        if ((*propositionB) == Negation::of(implication->getRightOperand())) {
-            out.push_back(std::make_shared<ModusTollens>(implication, propositionB));
-        }
-        return out;
+    if (auto mpResult = tryModusPonensFrom(propositionA, propositionB)) {
+        out.emplace_back(Rule::MP, mpResult);
     }
-    return {};
+    if (auto mtResult = tryModusTollensFrom(propositionA, propositionB)) {
+        out.emplace_back(Rule::MT, mtResult);
+    }
+    return out;
 }
 
 void Solver::verifyInitialArgument(const std::vector<Statement> &argument) {

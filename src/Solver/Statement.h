@@ -3,6 +3,7 @@
 
 #include "Propositions/WellFormedFormula.h"
 #include <vector>
+#include "Rules/Rule.h"
 
 enum class StatementType {
     PREMISE,
@@ -15,6 +16,7 @@ struct Statement {
     const StatementType type;
     const std::shared_ptr<WellFormedFormula> proposition;
     const int assumptionLevel;
+    const Rule rule;
 
     const std::vector<unsigned long> references;
     bool blocked {false};

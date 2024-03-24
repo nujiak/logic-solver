@@ -20,23 +20,13 @@ add_executable(${PROJECT_NAME}
         src/Propositions/BinaryOperations/Equivalence.cpp
         src/Propositions/BinaryOperations/BinaryOperation.cpp
         src/main.cpp
-        src/Rules/InferenceRules/ConjunctiveSyllogism.h
-        src/Rules/InferenceRules/ConjunctiveSyllogism.cpp
-        src/Rules/Inference.h
-        src/Rules/Inference.cpp
-        src/Rules/InferenceRules/DisjunctiveSyllogism.h
-        src/Rules/InferenceRules/DisjunctiveSyllogism.cpp
-        src/Rules/InferenceRules/ModusPonens.h
-        src/Rules/InferenceRules/ModusPonens.cpp
         src/Propositions/WellFormedFormula.cpp
-        src/Rules/InferenceRules/ModusTollens.h
-        src/Rules/InferenceRules/ModusTollens.cpp
-        src/Rules/SimplifyRules/And.cpp
-        src/Rules/SimplifyRules/Nor.h
-        src/Rules/SimplifyRules/Nor.cpp
-        src/Rules/SimplifyRules/Nif.h
-        src/Rules/SimplifyRules/Nif.cpp
         src/Solver/Solver.cpp
         src/Solver/Statement.h
         src/Solver/Statement.cpp
+        src/Rules/IRules.h
+        src/Rules/IRules.cpp
+        src/Rules/SRules.h
+        src/Rules/SRules.cpp
+        src/Rules/Rule.h
 )

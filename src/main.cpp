@@ -5,13 +5,8 @@
 #include "Propositions/BinaryOperations/Implication.h"
 #include "Propositions/BinaryOperations/Equivalence.h"
 #include "Propositions/Negation.h"
-#include "Rules/InferenceRules/ConjunctiveSyllogism.h"
-#include "Rules/InferenceRules/DisjunctiveSyllogism.h"
-#include "Rules/InferenceRules/ModusPonens.h"
-#include "Rules/InferenceRules/ModusTollens.h"
-#include "Rules/SimplifyRules/And.h"
-#include "Rules/SimplifyRules/Nor.h"
-#include "Rules/SimplifyRules/Nif.h"
+#include "Rules/IRules.h"
+#include "Rules/SRules.h"
 #include "Solver/Statement.h"
 #include "Solver/Solver.h"
 #include <memory>
@@ -37,31 +32,33 @@ void testSimplePropositions() {
     std::cout << (*implication == conversedImplication) << "\n";
     std::cout << (*conj == flippedConjunction) << "\n";
 
-    const auto negatedConjunction = std::dynamic_pointer_cast<Negation>(Negation::of(conj));
-    const auto conjunctiveSyllogism = std::make_shared<ConjunctiveSyllogism>(negatedConjunction, A);
+    const auto negatedConjunction = Negation::of(conj);
 
-    std::cout << std::make_shared<ConjunctiveSyllogism>(negatedConjunction, B)->getString() << "\n";
-    std::cout << std::make_shared<ConjunctiveSyllogism>(negatedConjunction, A)->getString() << "\n";
+    std::cout << tryConjunctiveSyllogismFrom(negatedConjunction, B)->getString() << "\n";
+    std::cout << tryConjunctiveSyllogismFrom(negatedConjunction, A)->getString() << "\n";
 
-    std::cout << std::make_shared<DisjunctiveSyllogism>(disjunction, Negation::of(A))->getString() << "\n";
-    std::cout << std::make_shared<DisjunctiveSyllogism>(disjunction, Negation::of(B))->getString() << "\n";
+    std::cout << tryDisjunctiveSyllogismFrom(disjunction, Negation::of(A))->getString() << "\n";
+    std::cout << tryDisjunctiveSyllogismFrom(disjunction, Negation::of(B))->getString() << "\n";
 
-    std::cout << std::make_shared<ModusPonens>(implication, conj)->getString() << "\n";
-    std::cout << std::make_shared<ModusTollens>(implication, Negation::of(disjunction))->getString() << "\n";
+    std::cout << tryModusPonensFrom(implication, conj)->getString() << "\n";
+    std::cout << tryModusTollensFrom(implication, Negation::of(disjunction))->getString() << "\n";
 
-    auto andInferences = And::from(conj);
-    std::cout << andInferences.first->getString() << "\n";
-    std::cout << andInferences.second->getString() << "\n";
+    auto andInferences = tryAndFrom(conj);
+    for (const auto& andInference : andInferences) {
+        std::cout << andInference->getString() << "\n";
+    }
 
     const auto negatedDisjunction = std::dynamic_pointer_cast<Negation>(Negation::of(disjunction));
-    auto norInferences = Nor::from(negatedDisjunction);
-    std::cout << norInferences.first->getString() << "\n";
-    std::cout << norInferences.second->getString() << "\n";
+    auto norInferences = tryNorFrom(negatedDisjunction);
+    for (const auto& norInference : norInferences) {
+        std::cout << norInference->getString() << "\n";
+    }
 
     const auto negatedImplication = std::dynamic_pointer_cast<Negation>(Negation::of(implication));
-    auto nifInferences = Nif::from(negatedImplication);
-    std::cout << nifInferences.first->getString() << "\n";
-    std::cout << nifInferences.second->getString() << "\n";
+    auto nifInferences = tryNifFrom(negatedImplication);
+    for (const auto& nifInference : nifInferences) {
+        std::cout << nifInference->getString() << "\n";
+    }
 }
 
 void testSimpleSolver() {
