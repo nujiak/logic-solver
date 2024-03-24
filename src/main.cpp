@@ -10,6 +10,7 @@
 #include "Rules/InferenceRules/ModusPonens.h"
 #include "Rules/InferenceRules/ModusTollens.h"
 #include "Rules/SimplifyRules/And.h"
+#include "Rules/SimplifyRules/Nor.h"
 #include <memory>
 #include <iostream>
 
@@ -48,4 +49,9 @@ int main() {
     auto andInferences = And::from(conj);
     std::cout << andInferences.first->getString() << "\n";
     std::cout << andInferences.second->getString() << "\n";
+
+    const auto negatedDisjunction = std::dynamic_pointer_cast<Negation>(Negation::of(disjunction));
+    auto norInferences = Nor::from(negatedDisjunction);
+    std::cout << norInferences.first->getString() << "\n";
+    std::cout << norInferences.second->getString() << "\n";
 }
