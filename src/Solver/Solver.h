@@ -21,6 +21,7 @@ private:
 
     static void verifyInitialArgument(const std::vector<Statement> &argument);
 
+    static std::vector<Statement> simplifyProof(std::vector<Statement> &proof);
 public:
     static std::vector<Statement> solve(std::vector<Statement> argument);
 };

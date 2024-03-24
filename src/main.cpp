@@ -12,6 +12,7 @@
 #include <memory>
 #include <iostream>
 #include <vector>
+#include "Solver/Printer.h"
 
 void testSimplePropositions() {
     const std::shared_ptr<WellFormedFormula> A = std::make_shared<Variable>('A');
@@ -85,9 +86,7 @@ void testSimpleSolver() {
             {StatementType::CONCLUSION, conclusion, 0},
     };
     auto results = Solver::solve(argument);
-    for (const auto &result : results) {
-        std::cout << result.getString() << "\n";
-    }
+    print(results);
 }
 
 int main() {

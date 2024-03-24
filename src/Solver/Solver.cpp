@@ -1,4 +1,5 @@
-#include <iostream>
+#include <unordered_set>
+#include <unordered_map>
 #include "Solver.h"
 #include "Propositions/Negation.h"
 #include "Rules/IRules.h"
@@ -8,15 +9,19 @@ std::vector<Statement> Solver::solve(std::vector<Statement> argument) {
     bool isChanged = true;
     unsigned long startAt = 0;
     verifyInitialArgument(argument);
-    std::vector<Statement> currentAssumptions{argument.back()};
+
+    std::vector<std::pair<unsigned long, Statement>> currentAssumptions;
 
     // Set up proof by contradiction
     argument.back().blocked = true;
     argument.emplace_back(
-            StatementType::CONCLUSION,
+            StatementType::ASSUMPTION,
             Negation::of(argument.back().proposition),
-            0
+            0,
+            Rule::NONE,
+            std::vector<unsigned long>{argument.size() - 1}
     );
+    currentAssumptions.emplace_back(argument.size() - 1, argument.back());
 
     while (isChanged) {
         isChanged = false;
@@ -27,7 +32,6 @@ std::vector<Statement> Solver::solve(std::vector<Statement> argument) {
                 continue;
             }
             if (i >= startAt) {
-                std::cout << i << "*: " << leftStatement.getString() << "\n";
                 auto sRuleResult = findSRule(leftStatement.proposition);
                 isChanged |= !sRuleResult.empty();
                 for (const auto &result: sRuleResult) {
@@ -39,13 +43,10 @@ std::vector<Statement> Solver::solve(std::vector<Statement> argument) {
                             std::vector<unsigned long>{i}
                     );
                 }
-            } else {
-                std::cout << i << ": " << leftStatement.getString() << "\n";
             }
 
             for (unsigned long j = std::max(i + 1, startAt); j < currentLength; j++) {
                 Statement rightStatement = argument[j];
-                std::cout << "\t" << j << ": " << rightStatement.getString() << "\n";
                 if (rightStatement.blocked) {
                     continue;
                 }
@@ -54,12 +55,14 @@ std::vector<Statement> Solver::solve(std::vector<Statement> argument) {
                 if ((*leftStatement.proposition) == Negation::of(rightStatement.proposition)) {
                     argument.emplace_back(
                             StatementType::CONTRADICTION,
-                            Negation::of(currentAssumptions.back().proposition),
-                            currentAssumptions.size() - 1
+                            Negation::of(currentAssumptions.back().second.proposition),
+                            currentAssumptions.size() - 1,
+                            Rule::NONE,
+                            std::vector<unsigned long>{currentAssumptions.back().first, i, j}
                     );
                     currentAssumptions.pop_back();
                     if (currentAssumptions.empty()) {
-                        return argument;
+                        goto SolverEnd;
                     }
                 }
 
@@ -90,7 +93,8 @@ std::vector<Statement> Solver::solve(std::vector<Statement> argument) {
         }
         startAt = currentLength;
     }
-    return argument;
+    SolverEnd:
+    return simplifyProof(argument);
 }
 
 std::vector<InferredProposition>
@@ -147,4 +151,54 @@ void Solver::verifyInitialArgument(const std::vector<Statement> &argument) {
         throw std::invalid_argument(
                 "argument should contain only premise statements and 1 conclusion statement as the last item");
     }
+}
+
+std::vector<Statement> Solver::simplifyProof(std::vector<Statement> &proof) {
+    for (Statement &statement: proof) {
+        statement.unused = true;
+    }
+    proof.back().unused = false;
+    std::vector<unsigned long> frontier{proof.back().references};
+    std::unordered_set<unsigned long> travelled;
+    while (!frontier.empty()) {
+        unsigned long index = frontier.back();
+        frontier.pop_back();
+        travelled.insert(index);
+        auto& statement = proof[index];
+        statement.unused = false;
+        for (auto reference: statement.references) {
+            if (!travelled.contains(reference)) {
+                frontier.push_back(reference);
+            }
+        }
+    }
+
+    std::vector<Statement> out;
+    std::unordered_map<unsigned long, unsigned long> adjustedIndex;
+    for (int i = 0; i < proof.size(); i++) {
+        const auto &statement = proof[i];
+        if (statement.unused && statement.type != StatementType::PREMISE){
+            continue;
+        }
+        adjustedIndex[i] = out.size();
+        std::vector<unsigned long> adjustedReferences;
+        adjustedReferences.reserve(statement.references.size());
+        for (auto reference: statement.references) {
+            adjustedReferences.push_back(adjustedIndex[reference]);
+        }
+
+        Statement newStatement{
+                statement.type,
+                statement.proposition,
+                statement.assumptionLevel,
+                statement.rule,
+                adjustedReferences,
+                statement.blocked,
+                statement.assumptionCompleted,
+                statement.broken,
+                statement.unused,
+        };
+        out.push_back(newStatement);
+    }
+    return out;
 }

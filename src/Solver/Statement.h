@@ -22,6 +22,7 @@ struct Statement {
     bool blocked {false};
     bool assumptionCompleted{false};
     bool broken{false};
+    bool unused{false};
 
     [[nodiscard]] std::string getString() const;
 };
