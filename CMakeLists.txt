@@ -28,4 +28,6 @@ add_executable(${PROJECT_NAME}
         src/Rules/InferenceRules/DisjunctiveSyllogism.cpp
         src/Rules/InferenceRules/ModusPonens.h
         src/Rules/InferenceRules/ModusPonens.cpp
-        src/Propositions/WellFormedFormula.cpp)
+        src/Propositions/WellFormedFormula.cpp
+        src/Rules/InferenceRules/ModusTollens.h
+        src/Rules/InferenceRules/ModusTollens.cpp)
