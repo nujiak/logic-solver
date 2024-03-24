@@ -7,3 +7,7 @@ bool Inference::operator==(const std::shared_ptr<WellFormedFormula> &other) cons
 std::string Inference::getString() const {
     return this->resultantProposition->getString();
 }
+
+std::shared_ptr<WellFormedFormula> Inference::getProposition() const {
+    return resultantProposition;
+}

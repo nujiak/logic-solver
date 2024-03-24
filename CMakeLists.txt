@@ -35,4 +35,8 @@ add_executable(${PROJECT_NAME}
         src/Rules/SimplifyRules/Nor.h
         src/Rules/SimplifyRules/Nor.cpp
         src/Rules/SimplifyRules/Nif.h
-        src/Rules/SimplifyRules/Nif.cpp)
+        src/Rules/SimplifyRules/Nif.cpp
+        src/Solver/Solver.cpp
+        src/Solver/Statement.h
+        src/Solver/Statement.cpp
+)
