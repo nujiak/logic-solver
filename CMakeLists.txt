@@ -33,4 +33,6 @@ add_executable(${PROJECT_NAME}
         src/Rules/InferenceRules/ModusTollens.cpp
         src/Rules/SimplifyRules/And.cpp
         src/Rules/SimplifyRules/Nor.h
-        src/Rules/SimplifyRules/Nor.cpp)
+        src/Rules/SimplifyRules/Nor.cpp
+        src/Rules/SimplifyRules/Nif.h
+        src/Rules/SimplifyRules/Nif.cpp)

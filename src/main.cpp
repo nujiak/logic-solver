@@ -11,6 +11,7 @@
 #include "Rules/InferenceRules/ModusTollens.h"
 #include "Rules/SimplifyRules/And.h"
 #include "Rules/SimplifyRules/Nor.h"
+#include "Rules/SimplifyRules/Nif.h"
 #include <memory>
 #include <iostream>
 
@@ -54,4 +55,9 @@ int main() {
     auto norInferences = Nor::from(negatedDisjunction);
     std::cout << norInferences.first->getString() << "\n";
     std::cout << norInferences.second->getString() << "\n";
+
+    const auto negatedImplication = std::dynamic_pointer_cast<Negation>(Negation::of(implication));
+    auto nifInferences = Nif::from(negatedImplication);
+    std::cout << nifInferences.first->getString() << "\n";
+    std::cout << nifInferences.second->getString() << "\n";
 }
