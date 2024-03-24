@@ -10,6 +10,8 @@ protected:
 
 public:
     bool operator==(const std::shared_ptr<WellFormedFormula> &other) const override;
+
+    [[nodiscard]] std::string getString() const override;
 };
 
 

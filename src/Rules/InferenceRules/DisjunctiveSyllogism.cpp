@@ -14,7 +14,3 @@ DisjunctiveSyllogism::DisjunctiveSyllogism(const std::shared_ptr<Disjunction> &d
     this->disjunction = disjunction;
     this->secondProposition = secondProposition;
 }
-
-std::string DisjunctiveSyllogism::getString() const {
-    return this->resultantProposition->getString();
-}

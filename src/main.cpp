@@ -7,6 +7,7 @@
 #include "Propositions/Negation.h"
 #include "Rules/InferenceRules/ConjunctiveSyllogism.h"
 #include "Rules/InferenceRules/DisjunctiveSyllogism.h"
+#include "Rules/InferenceRules/ModusPonens.h"
 #include <memory>
 #include <iostream>
 
@@ -38,4 +39,6 @@ int main() {
 
     std::cout << std::make_shared<DisjunctiveSyllogism>(disjunction, Negation::of(A))->getString() << "\n";
     std::cout << std::make_shared<DisjunctiveSyllogism>(disjunction, Negation::of(B))->getString() << "\n";
+
+    std::cout << std::make_shared<ModusPonens>(implication, conj)->getString() << "\n";
 }

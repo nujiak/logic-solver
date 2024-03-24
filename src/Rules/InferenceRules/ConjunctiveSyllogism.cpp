@@ -23,7 +23,3 @@ ConjunctiveSyllogism::ConjunctiveSyllogism(const std::shared_ptr<Negation> &nega
     this->negatedConjunction = negatedConjunction;
     this->secondProposition = secondProposition;
 }
-
-std::string ConjunctiveSyllogism::getString() const {
-    return this->resultantProposition->getString();
-}

@@ -8,12 +8,9 @@ class DisjunctiveSyllogism : public IRule {
 private:
     std::shared_ptr<Disjunction> disjunction;
     std::shared_ptr<WellFormedFormula> secondProposition;
-    std::shared_ptr<WellFormedFormula> resultantProposition;
 public:
     DisjunctiveSyllogism(const std::shared_ptr<Disjunction> &disjunction,
                          const std::shared_ptr<WellFormedFormula> &secondProposition);
-
-    [[nodiscard]] std::string getString() const override;
 };
 
 

@@ -10,12 +10,9 @@ class ConjunctiveSyllogism : public IRule {
 private:
     std::shared_ptr<Negation> negatedConjunction;
     std::shared_ptr<WellFormedFormula> secondProposition;
-    std::shared_ptr<WellFormedFormula> resultantProposition;
 public:
     ConjunctiveSyllogism(const std::shared_ptr<Negation> &negatedConjunction,
                          const std::shared_ptr<WellFormedFormula> &secondProposition);
-
-    [[nodiscard]] std::string getString() const override;
 };
 
 
