@@ -4,9 +4,9 @@
 #include <memory>
 #include "Propositions/Negation.h"
 #include "Propositions/WellFormedFormula.h"
-#include "Rules/InferenceRules/IRule.h"
+#include "Rules/Inference.h"
 
-class ConjunctiveSyllogism : public IRule {
+class ConjunctiveSyllogism : public Inference {
 private:
     std::shared_ptr<Negation> negatedConjunction;
     std::shared_ptr<WellFormedFormula> secondProposition;

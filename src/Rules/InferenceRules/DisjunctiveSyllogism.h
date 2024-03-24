@@ -1,10 +1,10 @@
 #ifndef LOGIC_SOLVER_DISJUNCTIVESYLLOGISM_H
 #define LOGIC_SOLVER_DISJUNCTIVESYLLOGISM_H
 
-#include "Rules/InferenceRules/IRule.h"
+#include "Rules/Inference.h"
 #include "Propositions/BinaryOperations/Disjunction.h"
 
-class DisjunctiveSyllogism : public IRule {
+class DisjunctiveSyllogism : public Inference {
 private:
     std::shared_ptr<Disjunction> disjunction;
     std::shared_ptr<WellFormedFormula> secondProposition;

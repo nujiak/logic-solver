@@ -1,10 +1,10 @@
 #ifndef LOGIC_SOLVER_MODUSTOLLENS_H
 #define LOGIC_SOLVER_MODUSTOLLENS_H
 
-#include "IRule.h"
+#include "Rules/Inference.h"
 #include "Propositions/BinaryOperations/Implication.h"
 
-class ModusTollens : public IRule {
+class ModusTollens : public Inference {
 private:
     std::shared_ptr<Implication> implication;
     std::shared_ptr<WellFormedFormula> antecedent;

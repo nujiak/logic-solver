@@ -9,6 +9,7 @@
 #include "Rules/InferenceRules/DisjunctiveSyllogism.h"
 #include "Rules/InferenceRules/ModusPonens.h"
 #include "Rules/InferenceRules/ModusTollens.h"
+#include "Rules/SimplifyRules/And.h"
 #include <memory>
 #include <iostream>
 
@@ -43,4 +44,8 @@ int main() {
 
     std::cout << std::make_shared<ModusPonens>(implication, conj)->getString() << "\n";
     std::cout << std::make_shared<ModusTollens>(implication, Negation::of(disjunction))->getString() << "\n";
+
+    auto andInferences = And::from(conj);
+    std::cout << andInferences.first->getString() << "\n";
+    std::cout << andInferences.second->getString() << "\n";
 }
