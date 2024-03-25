@@ -53,9 +53,9 @@ tryConjunctiveSyllogismFrom(const std::shared_ptr<WellFormedFormula> &maybeNegat
     if (!embeddedConjunction) {
         return {};
     }
-    if (secondProposition == embeddedConjunction->getLeftOperand()) {
+    if ((*secondProposition) == embeddedConjunction->getLeftOperand()) {
         return Negation::of(embeddedConjunction->getRightOperand());
-    } else if (secondProposition == embeddedConjunction->getRightOperand()) {
+    } else if ((*secondProposition) == embeddedConjunction->getRightOperand()) {
         return Negation::of(embeddedConjunction->getLeftOperand());
     }
     return {};
