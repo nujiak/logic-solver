@@ -1,7 +1,6 @@
 #include <vector>
 #include <stack>
 #include <unordered_set>
-#include <iostream>
 #include "Parser.h"
 #include "Propositions/BinaryOperations/Conjunction.h"
 #include "Propositions/BinaryOperations/Disjunction.h"
@@ -54,7 +53,6 @@ std::string toRpn(const std::string &input) {
 
 std::shared_ptr<WellFormedFormula> parse(const std::string &input) {
     std::string reversePolishNotation = toRpn(input);
-    std::cout << reversePolishNotation << "\n";
     std::stack<std::shared_ptr<WellFormedFormula>> propositions;
     for (const char &c: reversePolishNotation) {
         if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
