@@ -13,6 +13,7 @@
 #include <iostream>
 #include <vector>
 #include "Solver/Printer.h"
+#include "Parser/Parser.h"
 
 void testSimplePropositions() {
     const std::shared_ptr<WellFormedFormula> A = std::make_shared<Variable>('A');
@@ -89,7 +90,12 @@ void testSimpleSolver() {
     print(results);
 }
 
+void testParser() {
+    std::cout << parse("(A & (B @ C)) > !(A & C)")->getString() << "\n";
+}
+
 int main() {
 //    testSimplePropositions();
-    testSimpleSolver();
+//    testSimpleSolver();
+    testParser();
 }
