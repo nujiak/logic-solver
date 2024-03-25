@@ -15,7 +15,7 @@ std::shared_ptr<WellFormedFormula> Negation::of(const std::shared_ptr<WellFormed
 
 bool Negation::operator==(const std::shared_ptr<WellFormedFormula> &other) const {
     if (auto otherNegation = std::dynamic_pointer_cast<Negation>(other)) {
-        return this->operand == otherNegation->operand;
+        return (*this->operand) == otherNegation->operand;
     }
     return false;
 }
