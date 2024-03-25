@@ -1,7 +1,7 @@
 #include "Variable.h"
 
 std::string Variable::getString() const {
-    return {&this->name};
+    return {this->name};
 }
 
 bool Variable::operator==(const std::shared_ptr<WellFormedFormula> &other) const {
