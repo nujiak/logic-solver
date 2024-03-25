@@ -7,12 +7,13 @@
 #include "Propositions/BinaryOperations/Conjunction.h"
 
 std::shared_ptr<WellFormedFormula> tryModusTollensFrom(const std::shared_ptr<WellFormedFormula> &maybeImplication,
-                                                       const std::shared_ptr<WellFormedFormula> &antecedent) {
+                                                       const std::shared_ptr<WellFormedFormula> &consequence) {
     auto implication = std::dynamic_pointer_cast<Implication>(maybeImplication);
     if (!implication) {
         return {};
     }
-    if ((*antecedent) != Negation::of(implication->getRightOperand())) {
+    auto negatedRightOperand = Negation::of(implication->getRightOperand());
+    if ((*consequence) != negatedRightOperand) {
         return {};
     }
     return Negation::of(implication->getLeftOperand());
