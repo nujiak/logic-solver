@@ -130,8 +130,17 @@ std::vector<Statement> simplifyProof(std::vector<Statement> &proof) {
     return out;
 }
 
+std::shared_ptr<WellFormedFormula> tryBreakImplication(const std::shared_ptr<WellFormedFormula> &maybeImplication) {
+    auto implication = std::dynamic_pointer_cast<Implication>(maybeImplication);
+    if (!implication) {
+        return {};
+    }
+    return implication->getLeftOperand();
+}
+
 std::vector<Statement> solve(std::vector<Statement> argument) {
     bool isChanged = true;
+    bool canBreak = true;
     unsigned long startAt = 0;
     verifyInitialArgument(argument);
 
@@ -148,13 +157,32 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
     );
     currentAssumptions.emplace_back(argument.size() - 1, argument.back());
 
-    while (isChanged) {
+    while (isChanged || canBreak) {
+        bool lastIterationNoChange = !isChanged;
+        if (lastIterationNoChange) {
+            canBreak = false;
+        }
         isChanged = false;
         auto currentLength = argument.size();
         for (unsigned long i = 0; i < currentLength; i++) {
-            Statement leftStatement = argument[i];
+            Statement& leftStatement = argument[i];
             if (leftStatement.blocked) {
                 continue;
+            }
+            // Break implication if no new statements were added last iteration
+            if (lastIterationNoChange && !leftStatement.broken) {
+                if (auto brokenProposition = tryBreakImplication(leftStatement.proposition)) {
+                    leftStatement.broken = true;
+                    argument.emplace_back(StatementType::ASSUMPTION,
+                                          brokenProposition,
+                                          leftStatement.assumptionLevel + 1,
+                                          Rule::BREAK,
+                                          std::vector<unsigned long>{i});
+                    currentAssumptions.emplace_back(argument.size() - 1, argument.back());
+                    canBreak = true;
+                    isChanged = true;
+                    break;
+                }
             }
             if (i >= startAt) {
                 auto sRuleResult = findSRule(leftStatement.proposition);
@@ -171,7 +199,7 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
             }
 
             for (unsigned long j = std::max(i + 1, startAt); j < currentLength; j++) {
-                Statement rightStatement = argument[j];
+                Statement& rightStatement = argument[j];
                 if (rightStatement.blocked) {
                     continue;
                 }
@@ -181,13 +209,20 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
                     argument.emplace_back(
                             StatementType::CONTRADICTION,
                             Negation::of(currentAssumptions.back().second.proposition),
-                            currentAssumptions.size() - 1,
+                            currentAssumptions.size() <= 1 ? 0 : currentAssumptions.size() - 2,
                             Rule::NONE,
                             std::vector<unsigned long>{currentAssumptions.back().first, i, j}
                     );
                     currentAssumptions.pop_back();
                     if (currentAssumptions.empty()) {
                         goto SolverEnd;
+                    } else {
+                        for (auto statement = argument.end() - 2; statement >= argument.begin(); statement--) {
+                            if (statement->assumptionLevel < rightStatement.assumptionLevel) {
+                                break;
+                            }
+                            statement->blocked = true;
+                        }
                     }
                 }
 

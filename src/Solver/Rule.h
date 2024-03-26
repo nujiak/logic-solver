@@ -14,7 +14,8 @@ enum class Rule {
     MP,
     MT,
     IFF,
-    NIFF
+    NIFF,
+    BREAK
 };
 
 

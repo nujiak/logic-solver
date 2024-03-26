@@ -3,7 +3,7 @@
 
 #include "Propositions/WellFormedFormula.h"
 #include <vector>
-#include "Rules/Rule.h"
+#include "Rule.h"
 
 enum class StatementType {
     PREMISE,

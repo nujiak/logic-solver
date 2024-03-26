@@ -28,7 +28,7 @@ add_executable(${PROJECT_NAME}
         src/Rules/IRules.cpp
         src/Rules/SRules.h
         src/Rules/SRules.cpp
-        src/Rules/Rule.h
+        src/Solver/Rule.h
         src/Solver/Printer.h
         src/Solver/Printer.cpp
         src/Parser/Parser.h

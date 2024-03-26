@@ -49,6 +49,9 @@ void print(const std::vector<Statement> &proof) {
             adjustedIndex.push_back(i + 1 - runningBlockedCount);
         }
 
+        for (int j = 0 ; j < statement.assumptionLevel; j++) {
+            std::cout << "  ";
+        }
         switch (statement.type) {
             case StatementType::ASSUMPTION:
                 std::cout << "asm: ";
@@ -61,19 +64,25 @@ void print(const std::vector<Statement> &proof) {
         }
 
         std::cout << statement.proposition->getString() << " ";
-        if (statement.type == StatementType::CONTRADICTION) {
-            std::cout << "(from " << adjustedIndex[statement.references[0]] << "; "
-                      << adjustedIndex[statement.references[1]] << " contradicts "
-                      << adjustedIndex[statement.references[2]] << ") ";
-        } else if (!statement.references.empty()) {
-            std::cout << "(from";
-            for (const auto &reference: statement.references) {
-                std::cout << " " << adjustedIndex[reference];
-            }
-            std::cout << ") ";
-        }
 
-        std::cout << getRuleString(statement.rule);
+        if (statement.rule == Rule::BREAK) {
+            std::cout << "(break " << adjustedIndex[statement.references[0]] << ")";
+        } else {
+            if (statement.type == StatementType::CONTRADICTION) {
+                std::cout << "(from " << adjustedIndex[statement.references[0]] << "; "
+                          << adjustedIndex[statement.references[1]] << " contradicts "
+                          << adjustedIndex[statement.references[2]] << ") ";
+            } else if (!statement.references.empty()) {
+                std::cout << "(from " << statement.references[0];
+                for (auto reference = statement.references.begin() + 1;
+                     reference != statement.references.end(); reference++) {
+                    std::cout << ", " << adjustedIndex[*reference];
+                }
+                std::cout << ") ";
+            }
+
+            std::cout << getRuleString(statement.rule);
+        }
 
         std::cout << "\n";
     }
