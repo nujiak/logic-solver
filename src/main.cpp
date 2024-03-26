@@ -19,5 +19,5 @@ int main() {
         argument.emplace_back(StatementType::PREMISE, propositions[i], 0);
     }
     argument.emplace_back(StatementType::CONCLUSION, propositions.back(), 0);
-    print(Solver::solve(argument));
+    print(solve(argument));
 }

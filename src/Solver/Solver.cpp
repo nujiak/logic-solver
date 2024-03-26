@@ -5,7 +5,118 @@
 #include "Rules/IRules.h"
 #include "Rules/SRules.h"
 
-std::vector<Statement> Solver::solve(std::vector<Statement> argument) {
+struct InferredProposition {
+    Rule rule;
+    std::shared_ptr<WellFormedFormula> proposition;
+};
+
+std::vector<InferredProposition>
+findSRule(const std::shared_ptr<WellFormedFormula> &proposition) {
+    std::vector<InferredProposition> out;
+    auto andResults = tryAndFrom(proposition);
+    if (!andResults.empty()) {
+        for (const auto &andResult: andResults) {
+            out.emplace_back(Rule::AND, andResult);
+        }
+    }
+    auto norResults = tryNorFrom(proposition);
+    if (!norResults.empty()) {
+        for (const auto &norResult: norResults) {
+            out.emplace_back(Rule::NOR, norResult);
+        }
+    }
+    auto nifResults = tryNifFrom(proposition);
+    if (!nifResults.empty()) {
+        for (const auto &nifResult: nifResults) {
+            out.emplace_back(Rule::NIF, nifResult);
+        }
+    }
+    return out;
+}
+
+std::vector<InferredProposition>
+findIRule(const std::shared_ptr<WellFormedFormula> &propositionA,
+          const std::shared_ptr<WellFormedFormula> &propositionB) {
+    std::vector<InferredProposition> out;
+    if (auto dsResult = tryDisjunctiveSyllogismFrom(propositionA, propositionB)) {
+        out.emplace_back(Rule::DS, dsResult);
+    }
+    if (auto csResult = tryConjunctiveSyllogismFrom(propositionA, propositionB)) {
+        out.emplace_back(Rule::CS, csResult);
+    }
+    if (auto mpResult = tryModusPonensFrom(propositionA, propositionB)) {
+        out.emplace_back(Rule::MP, mpResult);
+    }
+    if (auto mtResult = tryModusTollensFrom(propositionA, propositionB)) {
+        out.emplace_back(Rule::MT, mtResult);
+    }
+    return out;
+}
+
+void verifyInitialArgument(const std::vector<Statement> &argument) {
+    for (auto i = 0; i < argument.size() - 1; i++) {
+        if (argument[i].type != StatementType::PREMISE) {
+            throw std::invalid_argument(
+                    "argument should contain only premise statements and 1 conclusion statement as the last item");
+        }
+    }
+    if (argument.back().type != StatementType::CONCLUSION) {
+        throw std::invalid_argument(
+                "argument should contain only premise statements and 1 conclusion statement as the last item");
+    }
+}
+
+std::vector<Statement> simplifyProof(std::vector<Statement> &proof) {
+    for (Statement &statement: proof) {
+        statement.unused = true;
+    }
+    proof.back().unused = false;
+    std::vector<unsigned long> frontier{proof.back().references};
+    std::unordered_set<unsigned long> travelled;
+    while (!frontier.empty()) {
+        unsigned long index = frontier.back();
+        frontier.pop_back();
+        travelled.insert(index);
+        auto& statement = proof[index];
+        statement.unused = false;
+        for (auto reference: statement.references) {
+            if (!travelled.contains(reference)) {
+                frontier.push_back(reference);
+            }
+        }
+    }
+
+    std::vector<Statement> out;
+    std::unordered_map<unsigned long, unsigned long> adjustedIndex;
+    for (int i = 0; i < proof.size(); i++) {
+        const auto &statement = proof[i];
+        if (statement.unused && statement.type != StatementType::PREMISE){
+            continue;
+        }
+        adjustedIndex[i] = out.size();
+        std::vector<unsigned long> adjustedReferences;
+        adjustedReferences.reserve(statement.references.size());
+        for (auto reference: statement.references) {
+            adjustedReferences.push_back(adjustedIndex[reference]);
+        }
+
+        Statement newStatement{
+                statement.type,
+                statement.proposition,
+                statement.assumptionLevel,
+                statement.rule,
+                adjustedReferences,
+                statement.blocked,
+                statement.assumptionCompleted,
+                statement.broken,
+                statement.unused,
+        };
+        out.push_back(newStatement);
+    }
+    return out;
+}
+
+std::vector<Statement> solve(std::vector<Statement> argument) {
     bool isChanged = true;
     unsigned long startAt = 0;
     verifyInitialArgument(argument);
@@ -95,110 +206,4 @@ std::vector<Statement> Solver::solve(std::vector<Statement> argument) {
     }
     SolverEnd:
     return simplifyProof(argument);
-}
-
-std::vector<InferredProposition>
-Solver::findSRule(const std::shared_ptr<WellFormedFormula> &proposition) {
-    std::vector<InferredProposition> out;
-    auto andResults = tryAndFrom(proposition);
-    if (!andResults.empty()) {
-        for (const auto &andResult: andResults) {
-            out.emplace_back(Rule::AND, andResult);
-        }
-    }
-    auto norResults = tryNorFrom(proposition);
-    if (!norResults.empty()) {
-        for (const auto &norResult: norResults) {
-            out.emplace_back(Rule::NOR, norResult);
-        }
-    }
-    auto nifResults = tryNifFrom(proposition);
-    if (!nifResults.empty()) {
-        for (const auto &nifResult: nifResults) {
-            out.emplace_back(Rule::NIF, nifResult);
-        }
-    }
-    return out;
-}
-
-std::vector<InferredProposition>
-Solver::findIRule(const std::shared_ptr<WellFormedFormula> &propositionA,
-                  const std::shared_ptr<WellFormedFormula> &propositionB) {
-    std::vector<InferredProposition> out;
-    if (auto dsResult = tryDisjunctiveSyllogismFrom(propositionA, propositionB)) {
-        out.emplace_back(Rule::DS, dsResult);
-    }
-    if (auto csResult = tryConjunctiveSyllogismFrom(propositionA, propositionB)) {
-        out.emplace_back(Rule::CS, csResult);
-    }
-    if (auto mpResult = tryModusPonensFrom(propositionA, propositionB)) {
-        out.emplace_back(Rule::MP, mpResult);
-    }
-    if (auto mtResult = tryModusTollensFrom(propositionA, propositionB)) {
-        out.emplace_back(Rule::MT, mtResult);
-    }
-    return out;
-}
-
-void Solver::verifyInitialArgument(const std::vector<Statement> &argument) {
-    for (auto i = 0; i < argument.size() - 1; i++) {
-        if (argument[i].type != StatementType::PREMISE) {
-            throw std::invalid_argument(
-                    "argument should contain only premise statements and 1 conclusion statement as the last item");
-        }
-    }
-    if (argument.back().type != StatementType::CONCLUSION) {
-        throw std::invalid_argument(
-                "argument should contain only premise statements and 1 conclusion statement as the last item");
-    }
-}
-
-std::vector<Statement> Solver::simplifyProof(std::vector<Statement> &proof) {
-    for (Statement &statement: proof) {
-        statement.unused = true;
-    }
-    proof.back().unused = false;
-    std::vector<unsigned long> frontier{proof.back().references};
-    std::unordered_set<unsigned long> travelled;
-    while (!frontier.empty()) {
-        unsigned long index = frontier.back();
-        frontier.pop_back();
-        travelled.insert(index);
-        auto& statement = proof[index];
-        statement.unused = false;
-        for (auto reference: statement.references) {
-            if (!travelled.contains(reference)) {
-                frontier.push_back(reference);
-            }
-        }
-    }
-
-    std::vector<Statement> out;
-    std::unordered_map<unsigned long, unsigned long> adjustedIndex;
-    for (int i = 0; i < proof.size(); i++) {
-        const auto &statement = proof[i];
-        if (statement.unused && statement.type != StatementType::PREMISE){
-            continue;
-        }
-        adjustedIndex[i] = out.size();
-        std::vector<unsigned long> adjustedReferences;
-        adjustedReferences.reserve(statement.references.size());
-        for (auto reference: statement.references) {
-            adjustedReferences.push_back(adjustedIndex[reference]);
-        }
-
-        Statement newStatement{
-                statement.type,
-                statement.proposition,
-                statement.assumptionLevel,
-                statement.rule,
-                adjustedReferences,
-                statement.blocked,
-                statement.assumptionCompleted,
-                statement.broken,
-                statement.unused,
-        };
-        out.push_back(newStatement);
-    }
-    return out;
 }
