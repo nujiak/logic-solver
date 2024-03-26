@@ -58,6 +58,12 @@ findIRule(const std::shared_ptr<WellFormedFormula> &propositionA,
     if (auto mtResult = tryModusTollensFrom(propositionA, propositionB)) {
         out.emplace_back(Rule::MT, mtResult);
     }
+    if (auto iffResult = tryIffFrom(propositionA, propositionB)) {
+        out.emplace_back(Rule::IFF, iffResult);
+    }
+    if (auto niffResult = tryNiffFrom(propositionA, propositionB)) {
+        out.emplace_back(Rule::NIFF, niffResult);
+    }
     return out;
 }
 

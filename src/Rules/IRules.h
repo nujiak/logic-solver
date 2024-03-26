@@ -23,4 +23,10 @@ std::shared_ptr<WellFormedFormula> tryConjunctiveSyllogismFrom(
         const std::shared_ptr<WellFormedFormula> &secondProposition
 );
 
+std::shared_ptr<WellFormedFormula> tryIffFrom(const std::shared_ptr<WellFormedFormula> &maybeEquivalence,
+                                              const std::shared_ptr<WellFormedFormula> &secondProposition);
+
+std::shared_ptr<WellFormedFormula> tryNiffFrom(const std::shared_ptr<WellFormedFormula> &maybeNegatedEquivalence,
+                                               const std::shared_ptr<WellFormedFormula> &secondProposition);
+
 #endif //LOGIC_SOLVER_IRULES_H

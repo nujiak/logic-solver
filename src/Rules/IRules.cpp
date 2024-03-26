@@ -5,6 +5,7 @@
 #include "Propositions/BinaryOperations/Implication.h"
 #include "Propositions/BinaryOperations/Disjunction.h"
 #include "Propositions/BinaryOperations/Conjunction.h"
+#include "Propositions/BinaryOperations/Equivalence.h"
 
 std::shared_ptr<WellFormedFormula> tryModusTollensFrom(const std::shared_ptr<WellFormedFormula> &maybeImplication,
                                                        const std::shared_ptr<WellFormedFormula> &consequence) {
@@ -57,6 +58,52 @@ tryConjunctiveSyllogismFrom(const std::shared_ptr<WellFormedFormula> &maybeNegat
         return Negation::of(embeddedConjunction->getRightOperand());
     } else if ((*secondProposition) == embeddedConjunction->getRightOperand()) {
         return Negation::of(embeddedConjunction->getLeftOperand());
+    }
+    return {};
+}
+
+std::shared_ptr<WellFormedFormula> tryIffFrom(const std::shared_ptr<WellFormedFormula> &maybeEquivalence,
+                                              const std::shared_ptr<WellFormedFormula> &secondProposition) {
+    auto equivalence = std::dynamic_pointer_cast<Equivalence>(maybeEquivalence);
+    if (!equivalence) {
+        return {};
+    }
+    if ((*secondProposition) == equivalence->getLeftOperand()) {
+        return equivalence->getRightOperand();
+    }
+
+    if ((*secondProposition) == equivalence->getRightOperand()) {
+        return equivalence->getLeftOperand();
+    }
+
+    if ((*secondProposition) == Negation::of(equivalence->getLeftOperand())) {
+        return Negation::of(equivalence->getLeftOperand());
+    }
+    if ((*secondProposition) == Negation::of(equivalence->getRightOperand())) {
+        return Negation::of(equivalence->getRightOperand());
+    }
+    return {};
+}
+
+std::shared_ptr<WellFormedFormula> tryNiffFrom(const std::shared_ptr<WellFormedFormula> &maybeNegatedEquivalence,
+                                               const std::shared_ptr<WellFormedFormula> &secondProposition) {
+    auto equivalence = std::dynamic_pointer_cast<Equivalence>(Negation::of(maybeNegatedEquivalence));
+    if (!equivalence) {
+        return {};
+    }
+    if ((*secondProposition) == equivalence->getLeftOperand()) {
+        return Negation::of(equivalence->getRightOperand());
+    }
+
+    if ((*secondProposition) == equivalence->getRightOperand()) {
+        return Negation::of(equivalence->getLeftOperand());
+    }
+
+    if ((*secondProposition) == Negation::of(equivalence->getLeftOperand())) {
+        return equivalence->getLeftOperand();
+    }
+    if ((*secondProposition) == Negation::of(equivalence->getRightOperand())) {
+        return equivalence->getRightOperand();
     }
     return {};
 }

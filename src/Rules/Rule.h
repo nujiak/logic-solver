@@ -12,7 +12,9 @@ enum class Rule {
     CS,
     DS,
     MP,
-    MT
+    MT,
+    IFF,
+    NIFF
 };
 
 

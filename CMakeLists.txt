@@ -33,4 +33,5 @@ add_executable(${PROJECT_NAME}
         src/Solver/Printer.cpp
         src/Parser/Parser.h
         src/Parser/Parser.cpp
+        src/NotImplementedError.h
 )

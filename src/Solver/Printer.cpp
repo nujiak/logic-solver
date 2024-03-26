@@ -1,5 +1,37 @@
 #include "Printer.h"
 #include <iostream>
+#include "NotImplementedError.h"
+
+std::string getRuleString(const Rule& rule) {
+    switch (rule) {
+        case Rule::NIF:
+            return "NIF";
+        case Rule::AND:
+            return "AND";
+        case Rule::NOR:
+            return "NOR";
+        case Rule::EQ:
+            return "EQ";
+        case Rule::NEQ:
+            return "NEQ";
+        case Rule::CS:
+            return "CS";
+        case Rule::DS:
+            return "DS";
+        case Rule::MP:
+            return "MP";
+        case Rule::MT:
+            return "MT";
+        case Rule::IFF:
+            return "IFF";
+        case Rule::NIFF:
+            return "NIFF";
+        case Rule::NONE:
+            return "";
+        default:
+            throw NotImplementedError("getRuleString for given rule");
+    }
+}
 
 void print(const std::vector<Statement> &proof) {
     std::vector<unsigned long> adjustedIndex;
@@ -41,32 +73,7 @@ void print(const std::vector<Statement> &proof) {
             std::cout << ") ";
         }
 
-        switch (statement.rule) {
-            case Rule::NIF:
-                std::cout << "NIF";
-                break;
-            case Rule::AND:
-                std::cout << "AND";
-                break;
-            case Rule::NOR:
-                std::cout << "NOR";
-                break;
-            case Rule::CS:
-                std::cout << "CS";
-                break;
-            case Rule::DS:
-                std::cout << "DS";
-                break;
-            case Rule::MP:
-                std::cout << "MP";
-                break;
-            case Rule::MT:
-                std::cout << "MT";
-                break;
-            case Rule::NONE:
-            default:
-                break;
-        }
+        std::cout << getRuleString(statement.rule);
 
         std::cout << "\n";
     }
