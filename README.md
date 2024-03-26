@@ -12,11 +12,15 @@ The current implemented rules are:
     - AND
     - NOR
     - NIF
+    - EQ
+    - NEQ
 - I-Rules
     - Conjunctive syllogism (CS)
     - Disjunctive syllogism (DS)
     - Modus ponens (MP)
     - Modus tollens (MT)
+    - IFF
+    - NIFF
 
 ## Compiling
 
