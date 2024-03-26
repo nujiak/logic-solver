@@ -30,16 +30,14 @@ The current implemented rules are:
 
 ```console
 git clone https://github.com/nujiak/logic-solver
-cd logic-solver
 ```
 
 2. Compile `logic-solver`:
 
 ```console
 cd logic-solver
-mkdir build; cd build
-cmake -S ..
-make
+cmake -B build
+cmake --build build
 ```
 
 3. `logic-solver` will be compiled into an executable `logic_solver` in the `build` subdirectory.
@@ -74,13 +72,13 @@ First, write the argument into a text file, using the symbols above. For example
 Then, pipe the file content into `logic_solver`:
 
 ```console
-cat sample_argument.in | ./logic_solver
+cat sample_argument.in | .build/logic_solver
 ```
 
 `logic-solver` will then complete the proof and output the simplified statements:
 
 > ```console
-> logic-solver/build$ cat sample_argument.in | ./logic_solver
+> logic-solver/build$ cat sample_argument.in | ./build/logic_solver
 > 1. (I > (U & !C)) 
 > 2. (U > (D @ E))
 > 3. (D > A)
