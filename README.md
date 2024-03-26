@@ -38,7 +38,7 @@ cmake -S ..
 make
 ```
 
-3. `logic-solver` will be compiled into an executable `logic-solver` in the `build` subdirectory.
+3. `logic-solver` will be compiled into an executable `logic_solver` in the `build` subdirectory.
 
 ## Usage
 
@@ -67,16 +67,16 @@ First, write the argument into a text file, using the symbols above. For example
 > !I
 > ```
 
-Then, pipe the file content into `logic-solver`:
+Then, pipe the file content into `logic_solver`:
 
 ```console
-cat sample_argument.in | ./logic-solver
+cat sample_argument.in | ./logic_solver
 ```
 
 `logic-solver` will then complete the proof and output the simplified statements:
 
 > ```console
-> logic-solver/build$ cat sample_argument.in | ./logic-solver
+> logic-solver/build$ cat sample_argument.in | ./logic_solver
 > 1. (I > (U & !C)) 
 > 2. (U > (D @ E))
 > 3. (D > A)
