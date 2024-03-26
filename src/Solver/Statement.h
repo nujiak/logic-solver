@@ -23,6 +23,7 @@ struct Statement {
     bool assumptionCompleted{false};
     bool broken{false};
     bool unused{false};
+    bool skip{false};
 
     [[nodiscard]] std::string getString() const;
 };

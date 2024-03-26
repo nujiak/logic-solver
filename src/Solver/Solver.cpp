@@ -124,6 +124,7 @@ std::vector<Statement> simplifyProof(std::vector<Statement> &proof) {
                 statement.assumptionCompleted,
                 statement.broken,
                 statement.unused,
+                statement.skip,
         };
         out.push_back(newStatement);
     }
@@ -166,7 +167,7 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
         auto currentLength = argument.size();
         for (unsigned long i = 0; i < currentLength; i++) {
             Statement& leftStatement = argument[i];
-            if (leftStatement.blocked) {
+            if (leftStatement.blocked || leftStatement.skip) {
                 continue;
             }
             // Break implication if no new statements were added last iteration
@@ -200,7 +201,7 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
 
             for (unsigned long j = std::max(i + 1, startAt); j < currentLength; j++) {
                 Statement& rightStatement = argument[j];
-                if (rightStatement.blocked) {
+                if (rightStatement.blocked || rightStatement.skip) {
                     continue;
                 }
 
@@ -221,7 +222,7 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
                             if (statement->assumptionLevel < rightStatement.assumptionLevel) {
                                 break;
                             }
-                            statement->blocked = true;
+                            statement->skip = true;
                         }
                     }
                 }
