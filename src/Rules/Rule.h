@@ -7,6 +7,8 @@ enum class Rule {
     AND,
     NIF,
     NOR,
+    EQ,
+    NEQ,
     CS,
     DS,
     MP,

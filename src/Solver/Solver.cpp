@@ -13,24 +13,32 @@ struct InferredProposition {
 std::vector<InferredProposition>
 findSRule(const std::shared_ptr<WellFormedFormula> &proposition) {
     std::vector<InferredProposition> out;
+
     auto andResults = tryAndFrom(proposition);
-    if (!andResults.empty()) {
-        for (const auto &andResult: andResults) {
-            out.emplace_back(Rule::AND, andResult);
-        }
+    for (const auto &andResult: andResults) {
+        out.emplace_back(Rule::AND, andResult);
     }
+
     auto norResults = tryNorFrom(proposition);
-    if (!norResults.empty()) {
-        for (const auto &norResult: norResults) {
-            out.emplace_back(Rule::NOR, norResult);
-        }
+    for (const auto &norResult: norResults) {
+        out.emplace_back(Rule::NOR, norResult);
     }
+
     auto nifResults = tryNifFrom(proposition);
-    if (!nifResults.empty()) {
-        for (const auto &nifResult: nifResults) {
-            out.emplace_back(Rule::NIF, nifResult);
-        }
+    for (const auto &nifResult: nifResults) {
+        out.emplace_back(Rule::NIF, nifResult);
     }
+
+    auto eqResults = tryEqFrom(proposition);
+    for (const auto &eqResult: eqResults) {
+        out.emplace_back(Rule::EQ, eqResult);
+    }
+
+    auto neqResults = tryNeqFrom(proposition);
+    for (const auto &neqResult: neqResults) {
+        out.emplace_back(Rule::NEQ, neqResult);
+    }
+
     return out;
 }
 
