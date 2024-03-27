@@ -52,6 +52,7 @@ FetchContent_MakeAvailable(googletest)
 add_executable(
         run_unit_tests
         test/Propositions/Variable.cpp
+        test/Propositions/Negation.cpp
 )
 enable_testing()
 target_link_libraries(
