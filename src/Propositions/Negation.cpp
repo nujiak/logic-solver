@@ -1,7 +1,7 @@
 #include "Negation.h"
 
 std::string Negation::getString() const {
-    return "!" + this->operand->getString();
+    return "~" + this->operand->getString();
 }
 
 std::shared_ptr<WellFormedFormula> Negation::of(const std::shared_ptr<WellFormedFormula> &proposition) {

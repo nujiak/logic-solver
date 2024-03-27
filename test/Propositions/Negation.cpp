@@ -34,11 +34,11 @@ TEST(NegationTest, UnwrapsCorrectly) {
 TEST(NegationTest, ReturnsCorrectString) {
     auto A = std::make_shared<Variable>('A');
     auto negatedA = Negation::of(A);
-    ASSERT_EQ(negatedA->getString(), "!A");
+    ASSERT_EQ(negatedA->getString(), "~A");
     ASSERT_EQ(Negation::of(negatedA)->getString(), "A");
 
     auto B = std::make_shared<Variable>('B');
     auto negatedB = Negation::of(B);
-    ASSERT_EQ(negatedB->getString(), "!B");
+    ASSERT_EQ(negatedB->getString(), "~B");
     ASSERT_EQ(Negation::of(negatedB)->getString(), "B");
 }

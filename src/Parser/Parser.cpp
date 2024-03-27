@@ -18,7 +18,7 @@ std::shared_ptr<WellFormedFormula> binaryOpFromStack(std::stack<std::shared_ptr<
     return operation;
 }
 
-const std::unordered_set<char> operators{'!', '>', '&', '@', '='};
+const std::unordered_set<char> operators{'~', '>', '&', '@', '='};
 
 std::string toRpn(const std::string &input) {
     std::string reversePolishNotation;
@@ -35,11 +35,9 @@ std::string toRpn(const std::string &input) {
         } else if (c == ')') {
             precedenceLevel--;
         } else if (operators.contains(c)) {
-            if (c != '!' && (!operatorStack.empty() && (operatorStack.top().second >= precedenceLevel))) {
-                while (!operatorStack.empty()) {
-                    reversePolishNotation += operatorStack.top().first;
-                    operatorStack.pop();
-                }
+            while (c != '~' && (!operatorStack.empty() && (operatorStack.top().second >= precedenceLevel))) {
+                reversePolishNotation += operatorStack.top().first;
+                operatorStack.pop();
             }
             operatorStack.emplace(c, precedenceLevel);
         }
@@ -61,7 +59,7 @@ std::shared_ptr<WellFormedFormula> parse(const std::string &input) {
         }
         auto rightOperand = propositions.top();
         propositions.pop();
-        if (c == '!') {
+        if (c == '~') {
             propositions.push(Negation::of(rightOperand));
             continue;
         }
