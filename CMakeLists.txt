@@ -53,6 +53,7 @@ add_executable(
         run_unit_tests
         test/Propositions/Variable.cpp
         test/Propositions/Negation.cpp
+        test/Propositions/BinaryOperations/Conjunction.cpp
 )
 enable_testing()
 target_link_libraries(
