@@ -55,6 +55,7 @@ add_executable(
         test/Propositions/Negation.cpp
         test/Propositions/BinaryOperations/Conjunction.cpp
         test/Propositions/BinaryOperations/Disjunction.cpp
+        test/Propositions/BinaryOperations/Equivalence.cpp
 )
 enable_testing()
 target_link_libraries(
