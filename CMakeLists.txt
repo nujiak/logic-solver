@@ -57,6 +57,7 @@ add_executable(
         test/Propositions/BinaryOperations/Disjunction.cpp
         test/Propositions/BinaryOperations/Equivalence.cpp
         test/Propositions/BinaryOperations/Implication.cpp
+        test/Rules/IRules.cpp
 )
 enable_testing()
 target_link_libraries(
