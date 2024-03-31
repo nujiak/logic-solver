@@ -166,6 +166,9 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
         isChanged = false;
         auto currentLength = argument.size();
         for (unsigned long i = 0; i < currentLength; i++) {
+            // Reserve space on argument to prevent reallocation and reference invalidation
+            // on adding s-rule and i-rule results
+            argument.reserve(3 + currentLength - startAt);
             Statement& leftStatement = argument[i];
             if (leftStatement.blocked || leftStatement.skip) {
                 continue;
