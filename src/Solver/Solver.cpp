@@ -210,6 +210,7 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
 
                 // Check for contradiction
                 if ((*leftStatement.proposition) == Negation::of(rightStatement.proposition)) {
+                    isChanged = true;
                     argument.emplace_back(
                             StatementType::CONTRADICTION,
                             Negation::of(currentAssumptions.back().second.proposition),
