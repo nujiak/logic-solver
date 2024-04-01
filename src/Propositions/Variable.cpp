@@ -11,3 +11,7 @@ bool Variable::operator==(const std::shared_ptr<WellFormedFormula> &other) const
     return false;
 }
 
+char Variable::getName() const {
+    return this->name;
+}
+

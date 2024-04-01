@@ -4,6 +4,7 @@
 #include "Propositions/Negation.h"
 #include "Rules/IRules.h"
 #include "Rules/SRules.h"
+#include "Propositions/Variable.h"
 
 struct InferredProposition {
     Rule rule;
@@ -80,12 +81,35 @@ void verifyInitialArgument(const std::vector<Statement> &argument) {
     }
 }
 
-std::vector<Statement> simplifyProof(std::vector<Statement> &proof) {
+std::vector<Statement> simplifyProof(std::vector<Statement> &proof, bool isProof) {
     for (Statement &statement: proof) {
         statement.unused = true;
     }
     proof.back().unused = false;
-    std::vector<unsigned long> frontier{proof.back().references};
+    std::vector<unsigned long> frontier;
+    if (isProof) {
+        frontier.insert(frontier.end(), proof.back().references.begin(), proof.back().references.end());
+    } else {
+        std::unordered_set<char> foundVariables;
+        for (auto statement = proof.end() - 1; statement >= proof.begin(); statement--) {
+            if (auto variable = std::dynamic_pointer_cast<Variable>(statement->proposition)) {
+                if (!foundVariables.contains(variable->getName())) {
+                    foundVariables.insert(variable->getName());
+                    frontier.insert(frontier.end(),
+                                    statement->references.begin(),
+                                    statement->references.end());
+                }
+            } else if (auto negatedVariable = std::dynamic_pointer_cast<Variable>(
+                    Negation::of(statement->proposition))) {
+                if (!foundVariables.contains(negatedVariable->getName())) {
+                    foundVariables.insert(negatedVariable->getName());
+                    frontier.insert(frontier.end(),
+                                    statement->references.begin(),
+                                    statement->references.end());
+                }
+            }
+        }
+    }
     std::unordered_set<unsigned long> travelled;
     while (!frontier.empty()) {
         unsigned long index = frontier.back();
@@ -143,6 +167,8 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
     bool isChanged = true;
     bool canBreak = true;
     unsigned long startAt = 0;
+    bool isProven = false;
+
     verifyInitialArgument(argument);
 
     std::vector<std::pair<unsigned long, Statement>> currentAssumptions;
@@ -220,6 +246,7 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
                     );
                     currentAssumptions.pop_back();
                     if (currentAssumptions.empty()) {
+                        isProven = true;
                         goto SolverEnd;
                     } else {
                         for (auto statement = argument.end() - 2; statement >= argument.begin(); statement--) {
@@ -259,5 +286,5 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
         startAt = currentLength;
     }
     SolverEnd:
-    return simplifyProof(argument);
+    return simplifyProof(argument, isProven);
 }
