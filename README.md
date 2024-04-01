@@ -55,18 +55,18 @@ The following symbols are used:
 | Disjunction      | @      |
 | Implication      | \>     |
 | Equivalence      | =      |
-| Negation         | !      |
+| Negation         | ~      |
 
 First, write the argument into a text file, using the symbols above. For example:
 
 > ```console
 > logic-solver/build$ cat sample_argument.in
-> I > (U & !C)
+> I > (U & ~C)
 > U > (D @ E)
 > D > A
-> !A
+> ~A
 > E > C
-> !I
+> ~I
 > ```
 
 Then, pipe the file content into `logic_solver`:
@@ -79,21 +79,21 @@ cat sample_argument.in | .build/logic_solver
 
 > ```console
 > logic-solver/build$ cat sample_argument.in | ./build/logic_solver
-> 1. (I > (U & !C)) 
+> 1. (I > (U & ~C)) 
 > 2. (U > (D @ E))
 > 3. (D > A)
-> 4. !A
+> 4. ~A
 > 5. (E > C)
- > | ∴ !I
+ > | ∴ ~I
 > 6. asm: I (from 5)
-> 7. ∴ (U & !C) (from 1 6) MP
-> 8. ∴ !D (from 3 4) MT
+> 7. ∴ (U & ~C) (from 1 6) MP
+> 8. ∴ ~D (from 3 4) MT
 > 9. ∴ U (from 7) AND
-> 10. ∴ !C (from 7) AND
+> 10. ∴ ~C (from 7) AND
 > 11. ∴ (D @ E) (from 2 9) MP
-> 12. ∴ !E (from 5 10) MT
+> 12. ∴ ~E (from 5 10) MT
 > 13. ∴ D (from 11 12) DS
-> 14. !I (from 6; 8 contradicts 13)
+> 14. ~I (from 6; 8 contradicts 13)
 > ```
 
 Note that `logic-solver` takes the last proposition in the given argument as the conclusion, and blocks it then assumes the negation.
