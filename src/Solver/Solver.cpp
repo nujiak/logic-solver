@@ -160,7 +160,7 @@ std::shared_ptr<WellFormedFormula> tryBreakImplication(const std::shared_ptr<Wel
     if (!implication) {
         return {};
     }
-    return implication->getLeftOperand();
+    return Negation::of(implication->getLeftOperand());
 }
 
 std::vector<Statement> solve(std::vector<Statement> argument) {
