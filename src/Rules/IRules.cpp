@@ -77,10 +77,10 @@ std::shared_ptr<WellFormedFormula> tryIffFrom(const std::shared_ptr<WellFormedFo
     }
 
     if ((*secondProposition) == Negation::of(equivalence->getLeftOperand())) {
-        return Negation::of(equivalence->getLeftOperand());
+        return Negation::of(equivalence->getRightOperand());
     }
     if ((*secondProposition) == Negation::of(equivalence->getRightOperand())) {
-        return Negation::of(equivalence->getRightOperand());
+        return Negation::of(equivalence->getLeftOperand());
     }
     return {};
 }
@@ -100,10 +100,10 @@ std::shared_ptr<WellFormedFormula> tryNiffFrom(const std::shared_ptr<WellFormedF
     }
 
     if ((*secondProposition) == Negation::of(equivalence->getLeftOperand())) {
-        return equivalence->getLeftOperand();
+        return equivalence->getRightOperand();
     }
     if ((*secondProposition) == Negation::of(equivalence->getRightOperand())) {
-        return equivalence->getRightOperand();
+        return equivalence->getLeftOperand();
     }
     return {};
 }
