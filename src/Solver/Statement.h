@@ -21,7 +21,7 @@ struct Statement {
     const std::vector<unsigned long> references;
     bool blocked {false};
     bool assumptionCompleted{false};
-    bool broken{false};
+    unsigned int brokenLevel{0};
     bool unused{false};
     bool skip{false};
 

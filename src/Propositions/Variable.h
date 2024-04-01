@@ -11,6 +11,8 @@ private:
 public:
     explicit Variable(char name) : name(name) {};
 
+    [[nodiscard]] char getName() const;
+
     [[nodiscard]] std::string getString() const override;
 
     [[nodiscard]] bool operator==(const std::shared_ptr<WellFormedFormula> &other) const override;

@@ -56,6 +56,7 @@ void print(const std::vector<Statement> &proof) {
             case StatementType::ASSUMPTION:
                 std::cout << "asm: ";
                 break;
+            case StatementType::CONTRADICTION:
             case StatementType::CONCLUSION:
                 std::cout << "\u2234 ";
                 break;
