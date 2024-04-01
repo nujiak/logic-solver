@@ -248,7 +248,7 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
 
                     // Un-break all statements broken after last assumption
                     for (Statement& statement: argument) {
-                        if (statement.brokenLevel > currentAssumptions.size()) {
+                        if (statement.brokenLevel >= currentAssumptions.size()) {
                             statement.brokenLevel = 0;
                         }
                     }
