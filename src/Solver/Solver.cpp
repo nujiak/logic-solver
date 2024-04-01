@@ -85,27 +85,23 @@ std::vector<Statement> simplifyProof(std::vector<Statement> &proof, bool isProof
     for (Statement &statement: proof) {
         statement.unused = true;
     }
-    proof.back().unused = false;
     std::vector<unsigned long> frontier;
     if (isProof) {
-        frontier.insert(frontier.end(), proof.back().references.begin(), proof.back().references.end());
+        frontier.push_back(proof.size() - 1);
     } else {
         std::unordered_set<char> foundVariables;
-        for (auto statement = proof.end() - 1; statement >= proof.begin(); statement--) {
-            if (auto variable = std::dynamic_pointer_cast<Variable>(statement->proposition)) {
+        for (unsigned long i = proof.size() - 1; i < proof.size(); i--) {
+            const auto& statement = proof[i];
+            if (auto variable = std::dynamic_pointer_cast<Variable>(statement.proposition)) {
                 if (!foundVariables.contains(variable->getName())) {
                     foundVariables.insert(variable->getName());
-                    frontier.insert(frontier.end(),
-                                    statement->references.begin(),
-                                    statement->references.end());
+                    frontier.push_back(i);
                 }
             } else if (auto negatedVariable = std::dynamic_pointer_cast<Variable>(
-                    Negation::of(statement->proposition))) {
+                    Negation::of(statement.proposition))) {
                 if (!foundVariables.contains(negatedVariable->getName())) {
                     foundVariables.insert(negatedVariable->getName());
-                    frontier.insert(frontier.end(),
-                                    statement->references.begin(),
-                                    statement->references.end());
+                    frontier.push_back(i);
                 }
             }
         }
