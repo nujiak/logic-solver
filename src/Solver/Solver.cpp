@@ -146,7 +146,7 @@ std::vector<Statement> simplifyProof(std::vector<Statement> &proof, bool isProof
                 adjustedReferences,
                 statement.blocked,
                 statement.assumptionCompleted,
-                statement.broken,
+                statement.brokenLevel,
                 statement.unused,
                 statement.skip,
         };
@@ -194,15 +194,15 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
         for (unsigned long i = 0; i < currentLength; i++) {
             // Reserve space on argument to prevent reallocation and reference invalidation
             // on adding s-rule and i-rule results
-            argument.reserve(3 + currentLength - startAt);
+            argument.reserve( argument.size() + 3 + currentLength - startAt);
             Statement& leftStatement = argument[i];
             if (leftStatement.blocked || leftStatement.skip) {
                 continue;
             }
             // Break implication if no new statements were added last iteration
-            if (lastIterationNoChange && !leftStatement.broken) {
+            if (lastIterationNoChange && leftStatement.brokenLevel == 0) {
                 if (auto brokenProposition = tryBreakImplication(leftStatement.proposition)) {
-                    leftStatement.broken = true;
+                    leftStatement.brokenLevel = currentAssumptions.size();
                     argument.emplace_back(StatementType::ASSUMPTION,
                                           brokenProposition,
                                           leftStatement.assumptionLevel + 1,
@@ -245,6 +245,13 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
                             std::vector<unsigned long>{currentAssumptions.back().first, i, j}
                     );
                     currentAssumptions.pop_back();
+
+                    // Un-break all statements broken after last assumption
+                    for (Statement& statement: argument) {
+                        if (statement.brokenLevel > currentAssumptions.size()) {
+                            statement.brokenLevel = 0;
+                        }
+                    }
                     if (currentAssumptions.empty()) {
                         isProven = true;
                         goto SolverEnd;
@@ -258,29 +265,40 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
                     }
                 }
 
-                auto iRuleResult = findIRule(leftStatement.proposition, rightStatement.proposition);
-                isChanged |= !iRuleResult.empty();
-                for (const auto &proposition: iRuleResult) {
-                    argument.emplace_back(
-                            StatementType::CONCLUSION,
-                            proposition.proposition,
-                            rightStatement.assumptionLevel,
-                            proposition.rule,
-                            std::vector<unsigned long>{i, j}
-                    );
+                if (leftStatement.brokenLevel == 0) {
+                    auto iRuleResult = findIRule(leftStatement.proposition, rightStatement.proposition);
+                    if (!iRuleResult.empty()) {
+                        isChanged = true;
+                        leftStatement.brokenLevel = currentAssumptions.size();
+                    }
+                    for (const auto &proposition: iRuleResult) {
+                        argument.emplace_back(
+                                StatementType::CONCLUSION,
+                                proposition.proposition,
+                                rightStatement.assumptionLevel,
+                                proposition.rule,
+                                std::vector<unsigned long>{i, j}
+                        );
+                    }
                 }
 
-                auto reversedIRuleResult = findIRule(rightStatement.proposition, leftStatement.proposition);
-                isChanged |= !reversedIRuleResult.empty();
-                for (const auto &proposition: reversedIRuleResult) {
-                    argument.emplace_back(
-                            StatementType::CONCLUSION,
-                            proposition.proposition,
-                            rightStatement.assumptionLevel,
-                            proposition.rule,
-                            std::vector<unsigned long>{i, j}
-                    );
+                if (rightStatement.brokenLevel == 0) {
+                    auto reversedIRuleResult = findIRule(rightStatement.proposition, leftStatement.proposition);
+                    if (!reversedIRuleResult.empty()) {
+                        isChanged = true;
+                        rightStatement.brokenLevel = currentAssumptions.size();
+                    }
+                    for (const auto &proposition: reversedIRuleResult) {
+                        argument.emplace_back(
+                                StatementType::CONCLUSION,
+                                proposition.proposition,
+                                rightStatement.assumptionLevel,
+                                proposition.rule,
+                                std::vector<unsigned long>{i, j}
+                        );
+                    }
                 }
+
             }
         }
         startAt = currentLength;
