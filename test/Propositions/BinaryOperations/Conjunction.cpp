@@ -48,9 +48,9 @@ TEST(ConjunctionTest, ReturnsCorrectString) {
     auto conjunction1 = std::make_shared<Conjunction>(A, B);
     auto conjunction2 = std::make_shared<Conjunction>(B, A);
 
-    ASSERT_EQ(conjunction1->getString(), "(A & B)");
-    ASSERT_NE(conjunction1->getString(), "(B & A)");
+    ASSERT_EQ(conjunction1->getString(), "(A&B)");
+    ASSERT_NE(conjunction1->getString(), "(B&A)");
 
-    ASSERT_EQ(conjunction2->getString(), "(B & A)");
-    ASSERT_NE(conjunction2->getString(), "(A & B)");
+    ASSERT_EQ(conjunction2->getString(), "(B&A)");
+    ASSERT_NE(conjunction2->getString(), "(A&B)");
 }

@@ -48,9 +48,9 @@ TEST(ImplicationTest, ReturnsCorrectString) {
     auto implication1 = std::make_shared<Implication>(A, B);
     auto implication2 = std::make_shared<Implication>(B, A);
 
-    ASSERT_EQ(implication1->getString(), "(A > B)");
-    ASSERT_NE(implication1->getString(), "(B > A)");
+    ASSERT_EQ(implication1->getString(), "(A>B)");
+    ASSERT_NE(implication1->getString(), "(B>A)");
 
-    ASSERT_EQ(implication2->getString(), "(B > A)");
-    ASSERT_NE(implication2->getString(), "(A > B)");
+    ASSERT_EQ(implication2->getString(), "(B>A)");
+    ASSERT_NE(implication2->getString(), "(A>B)");
 }

@@ -48,9 +48,9 @@ TEST(DisjunctionTest, ReturnsCorrectString) {
     auto disjunction1 = std::make_shared<Disjunction>(A, B);
     auto disjunction2 = std::make_shared<Disjunction>(B, A);
 
-    ASSERT_EQ(disjunction1->getString(), "(A @ B)");
-    ASSERT_NE(disjunction1->getString(), "(B @ A)");
+    ASSERT_EQ(disjunction1->getString(), "(A@B)");
+    ASSERT_NE(disjunction1->getString(), "(B@A)");
 
-    ASSERT_EQ(disjunction2->getString(), "(B @ A)");
-    ASSERT_NE(disjunction2->getString(), "(A @ B)");
+    ASSERT_EQ(disjunction2->getString(), "(B@A)");
+    ASSERT_NE(disjunction2->getString(), "(A@B)");
 }

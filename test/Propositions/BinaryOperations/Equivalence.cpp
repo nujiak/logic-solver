@@ -48,9 +48,9 @@ TEST(EquivalenceTest, ReturnsCorrectString) {
     auto equivalence1 = std::make_shared<Equivalence>(A, B);
     auto equivalence2 = std::make_shared<Equivalence>(B, A);
 
-    ASSERT_EQ(equivalence1->getString(), "(A = B)");
-    ASSERT_NE(equivalence1->getString(), "(B = A)");
+    ASSERT_EQ(equivalence1->getString(), "(A=B)");
+    ASSERT_NE(equivalence1->getString(), "(B=A)");
 
-    ASSERT_EQ(equivalence2->getString(), "(B = A)");
-    ASSERT_NE(equivalence2->getString(), "(A = B)");
+    ASSERT_EQ(equivalence2->getString(), "(B=A)");
+    ASSERT_NE(equivalence2->getString(), "(A=B)");
 }
