@@ -151,12 +151,20 @@ std::vector<Statement> simplifyProof(std::vector<Statement> &proof, bool isProof
     return out;
 }
 
-std::shared_ptr<WellFormedFormula> tryBreakImplication(const std::shared_ptr<WellFormedFormula> &maybeImplication) {
-    auto implication = std::dynamic_pointer_cast<Implication>(maybeImplication);
-    if (!implication) {
-        return {};
+std::shared_ptr<WellFormedFormula> tryBreakComplexWff(const std::shared_ptr<WellFormedFormula> &maybeComplexWff) {
+    if (auto implication = std::dynamic_pointer_cast<Implication>(maybeComplexWff)) {
+        return Negation::of(implication->getLeftOperand());
     }
-    return Negation::of(implication->getLeftOperand());
+
+    if (auto embeddedConjunction = std::dynamic_pointer_cast<Conjunction>(Negation::of(maybeComplexWff))) {
+        return Negation::of(embeddedConjunction->getLeftOperand());
+    }
+
+    if (auto disjunction = std::dynamic_pointer_cast<Disjunction>(maybeComplexWff)) {
+        return disjunction->getLeftOperand();
+    }
+
+    return {};
 }
 
 std::vector<Statement> solve(std::vector<Statement> argument) {
@@ -197,7 +205,7 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
             }
             // Break implication if no new statements were added last iteration
             if (lastIterationNoChange && leftStatement.brokenLevel == 0) {
-                if (auto brokenProposition = tryBreakImplication(leftStatement.proposition)) {
+                if (auto brokenProposition = tryBreakComplexWff(leftStatement.proposition)) {
                     leftStatement.brokenLevel = currentAssumptions.size();
                     argument.emplace_back(StatementType::ASSUMPTION,
                                           brokenProposition,
