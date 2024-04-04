@@ -61,39 +61,34 @@ First, write the argument into a text file, using the symbols above. For example
 
 > ```console
 > logic-solver/build$ cat sample_argument.in
-> I > (U & ~C)
-> U > (D @ E)
-> D > A
-> ~A
-> E > C
-> ~I
+> ((X>E)>(~C&T))
+> (C&~P)
+> ~(~X@P)
 > ```
 
-Then, pipe the file content into `logic_solver`:
+Then, redirect the file into `logic_solver`:
 
 ```console
-cat sample_argument.in | .build/logic_solver
+.build/logic_solver < sample_argument.in
 ```
 
 `logic-solver` will then complete the proof and output the simplified statements:
 
 > ```console
-> logic-solver/build$ cat sample_argument.in | ./build/logic_solver
-> 1. (I > (U & ~C)) 
-> 2. (U > (D @ E))
-> 3. (D > A)
-> 4. ~A
-> 5. (E > C)
- > | ∴ ~I
-> 6. asm: I (from 5)
-> 7. ∴ (U & ~C) (from 1 6) MP
-> 8. ∴ ~D (from 3 4) MT
-> 9. ∴ U (from 7) AND
-> 10. ∴ ~C (from 7) AND
-> 11. ∴ (D @ E) (from 2 9) MP
-> 12. ∴ ~E (from 5 10) MT
-> 13. ∴ D (from 11 12) DS
-> 14. ~I (from 6; 8 contradicts 13)
+> logic-solver/build$ ./build/logic_solver < sample_argument.in
+> 1. ((X>E)>(~C&T))
+> 2. (C&~P)
+>  | ∴ ~(~X@P)
+> 3. asm: (~X@P) (from 2)
+> 4. ∴ C (from 1) AND
+> 5. ∴ ~P (from 1) AND
+> 6. ∴ ~X (from 3, 5) DS
+> 7.   asm: ~(X>E) (break 1)
+> 8.   ∴ X (from 7) NIF
+> 9. ∴ (X>E) (from 7; 6 contradicts 8)
+> 10. ∴ (~C&T) (from 0, 9) MP
+> 11. ∴ ~C (from 10) AND
+> 12. ∴ ~(~X@P) (from 3; 4 contradicts 11)
 > ```
 
 Note that `logic-solver` takes the last proposition in the given argument as the conclusion, and blocks it then assumes the negation.
