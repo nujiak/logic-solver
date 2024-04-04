@@ -22,6 +22,13 @@ The current implemented rules are:
     - IFF
     - NIFF
 
+The following techniques are currently implemented:
+
+1. Easier proofs
+2. Harder proofs (by breaking implications, conjunctions, and disjunctions)
+3. Easier refutations
+4. Harder refutations (by breaking implications, conjunctions, and disjunctions)
+
 ## Compiling
 
 `logic-solver` can be compiled using CMake.
