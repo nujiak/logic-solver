@@ -5,6 +5,7 @@
 #include "Rules/IRules.h"
 #include "Rules/SRules.h"
 #include "Propositions/Variable.h"
+#include <stdexcept>
 
 struct InferredProposition {
     Rule rule;
@@ -209,7 +210,7 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
                     leftStatement.brokenLevel = currentAssumptions.size();
                     argument.emplace_back(StatementType::ASSUMPTION,
                                           brokenProposition,
-                                          leftStatement.assumptionLevel + 1,
+                                          leftStatement.brokenLevel,
                                           Rule::BREAK,
                                           std::vector<unsigned long>{i});
                     currentAssumptions.emplace_back(argument.size() - 1, argument.back());
