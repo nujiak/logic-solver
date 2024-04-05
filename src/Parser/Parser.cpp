@@ -34,6 +34,9 @@ std::string toRpn(const std::string &input) {
             precedenceLevel++;
         } else if (c == ')') {
             precedenceLevel--;
+            if (precedenceLevel < 0) {
+                throw std::invalid_argument(input + " has mismatched closing parentheses");
+            }
         } else if (operators.contains(c)) {
             while (c != '~' && (!operatorStack.empty() && (operatorStack.top().second >= precedenceLevel))) {
                 reversePolishNotation += operatorStack.top().first;
@@ -41,6 +44,9 @@ std::string toRpn(const std::string &input) {
             }
             operatorStack.emplace(c, precedenceLevel);
         }
+    }
+    if (precedenceLevel != 0) {
+        throw std::invalid_argument(input + " is missing closing parentheses");
     }
     while (!operatorStack.empty()) {
         reversePolishNotation += operatorStack.top().first;
