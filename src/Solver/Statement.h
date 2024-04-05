@@ -15,13 +15,13 @@ enum class StatementType {
 struct Statement {
     const StatementType type;
     const std::shared_ptr<WellFormedFormula> proposition;
-    const int assumptionLevel;
+    size_t assumptionLevel;
     const Rule rule;
 
-    const std::vector<unsigned long> references;
+    const std::vector<size_t> references;
     bool blocked {false};
     bool assumptionCompleted{false};
-    unsigned int brokenLevel{0};
+    size_t brokenLevel{0};
     bool unused{false};
     bool skip{false};
 
