@@ -37,6 +37,8 @@ add_library(${PROJECT_NAME}_lib
         src/Parser/Parser.h
         src/Parser/Parser.cpp
         src/NotImplementedError.h
+        src/Propositions/QuantifiedVariable.h
+        src/Propositions/QuantifiedVariable.cpp
 )
 target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}_lib)
 
@@ -58,6 +60,7 @@ add_executable(
         test/Propositions/BinaryOperations/Equivalence.cpp
         test/Propositions/BinaryOperations/Implication.cpp
         test/Rules/IRules.cpp
+        test/Propositions/QuantifiedVariable.cpp
 )
 enable_testing()
 target_link_libraries(
