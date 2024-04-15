@@ -14,7 +14,7 @@ bool Conjunction::operator==(const std::shared_ptr<WellFormedFormula> &other) co
     return false;
 }
 
-std::shared_ptr<WellFormedFormula> Conjunction::replaceSingularTerm(char from, char to, bool isTopLevel) const {
-    return std::make_shared<Conjunction>(this->leftOperand->replaceSingularTerm(from, to, false),
-                                         this->rightOperand->replaceSingularTerm(from, to, false));
+std::shared_ptr<WellFormedFormula> Conjunction::replaceSingularTerm(char to, bool isTopLevel) const {
+    return std::make_shared<Conjunction>(this->leftOperand->replaceSingularTerm(to, false),
+                                         this->rightOperand->replaceSingularTerm(to, false));
 }

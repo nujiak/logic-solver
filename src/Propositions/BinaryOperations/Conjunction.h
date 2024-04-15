@@ -17,7 +17,7 @@ public:
 
     [[nodiscard]] bool operator==(const std::shared_ptr<WellFormedFormula> &other) const override;
 
-    [[nodiscard]] std::shared_ptr<WellFormedFormula> replaceSingularTerm(char from, char to, bool isTopLevel) const override;
+    [[nodiscard]] std::shared_ptr<WellFormedFormula> replaceSingularTerm(char to, bool isTopLevel) const override;
 };
 
 

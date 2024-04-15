@@ -20,8 +20,8 @@ bool Negation::operator==(const std::shared_ptr<WellFormedFormula> &other) const
     return false;
 }
 
-std::shared_ptr<WellFormedFormula> Negation::replaceSingularTerm(char from, char to, bool isTopLevel) const {
-    return this->operand->replaceSingularTerm(from, to, false);
+std::shared_ptr<WellFormedFormula> Negation::replaceSingularTerm(char to, bool isTopLevel) const {
+    return this->operand->replaceSingularTerm(to, false);
 }
 
 std::unordered_set<char> Negation::getSingularTerms() const {

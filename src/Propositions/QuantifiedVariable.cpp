@@ -11,10 +11,7 @@ bool QuantifiedVariable::operator==(const std::shared_ptr<WellFormedFormula> &ot
     return false;
 }
 
-std::shared_ptr<WellFormedFormula> QuantifiedVariable::replaceSingularTerm(char from, char to, bool isTopLevel) const {
-    if (this->singularTerm == from) {
-        return std::make_shared<QuantifiedVariable>(this->name, to);
-    }
+std::shared_ptr<WellFormedFormula> QuantifiedVariable::replaceSingularTerm(char to, bool isTopLevel) const {
     return std::make_shared<QuantifiedVariable>(this->name, this->singularTerm);
 }
 

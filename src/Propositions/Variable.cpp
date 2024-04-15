@@ -15,7 +15,7 @@ char Variable::getName() const {
     return this->name;
 }
 
-std::shared_ptr<WellFormedFormula> Variable::replaceSingularTerm(char from, char to, bool isTopLevel) const {
+std::shared_ptr<WellFormedFormula> Variable::replaceSingularTerm(char to, bool isTopLevel) const {
     return std::make_shared<Variable>(this->name);
 }
 

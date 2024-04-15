@@ -12,7 +12,7 @@ bool Implication::operator==(const std::shared_ptr<WellFormedFormula> &other) co
     return false;
 }
 
-std::shared_ptr<WellFormedFormula> Implication::replaceSingularTerm(char from, char to, bool isTopLevel) const {
-    return std::make_shared<Implication>(this->leftOperand->replaceSingularTerm(from, to, false),
-                                         this->rightOperand->replaceSingularTerm(from, to, false));
+std::shared_ptr<WellFormedFormula> Implication::replaceSingularTerm(char to, bool isTopLevel) const {
+    return std::make_shared<Implication>(this->leftOperand->replaceSingularTerm(to, false),
+                                         this->rightOperand->replaceSingularTerm(to, false));
 }

@@ -2,7 +2,7 @@
 
 bool ForAll::operator==(const std::shared_ptr<WellFormedFormula> &other) const {
     if (auto forAll = std::dynamic_pointer_cast<ForAll>(other)) {
-        return this->singularTerm == forAll->singularTerm && (*this->proposition) == forAll->proposition;
+        return (*this->proposition) == forAll->proposition;
     }
     return false;
 }
