@@ -268,7 +268,7 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
         }
 
         // Drop universals
-        currentLength = currentAssumptions.size();
+        currentLength = argument.size();
         for (size_t i = 0; i < currentLength; i++) {
             argument.reserve(singularTerms.size());
             Statement &statement = argument[i];
