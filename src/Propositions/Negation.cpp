@@ -21,7 +21,7 @@ bool Negation::operator==(const std::shared_ptr<WellFormedFormula> &other) const
 }
 
 std::shared_ptr<WellFormedFormula> Negation::replaceSingularTerm(char to, bool isTopLevel) const {
-    return this->operand->replaceSingularTerm(to, false);
+    return Negation::of(this->operand->replaceSingularTerm(to, false));
 }
 
 std::unordered_set<char> Negation::getSingularTerms() const {

@@ -144,7 +144,6 @@ std::vector<Statement> simplifyProof(std::vector<Statement> &proof, bool isProof
                 statement.rule,
                 adjustedReferences,
                 statement.blocked,
-                statement.assumptionCompleted,
                 statement.brokenLevel,
                 statement.unused,
                 statement.skip,
@@ -226,6 +225,45 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
                         Rule::NONE,
                         std::vector<size_t>{i}
                 );
+                isChanged = true;
+            }
+        }
+
+        // Drop existential
+        currentLength = argument.size();
+        std::unordered_set<char> singularTerms = [&argument, &currentAssumptions]() {
+            // combine all singular terms used across all statements
+            std::unordered_set<char> symbols{};
+            for (const auto &statement: argument) {
+                if (!statement.skip) {
+                    const auto statementSymbols = statement.proposition->getSingularTerms();
+                    symbols.insert(statementSymbols.begin(), statementSymbols.end());
+                }
+            }
+            return symbols;
+        }();
+        char nextSingularTerm = 'a';
+        for (size_t i = startAt; i < currentLength; i++) {
+            Statement &statement = argument[i];
+            if (statement.brokenLevel > 0) {
+                continue;
+            }
+            if (const auto forEach = std::dynamic_pointer_cast<ForEach>(statement.proposition)) {
+                while (singularTerms.contains(nextSingularTerm) || nextSingularTerm == 'x') {
+                    nextSingularTerm++;
+                }
+                if (nextSingularTerm > 'z') {
+                    throw std::overflow_error("Singular terms exceeded z, argument may be too long");
+                }
+                statement.brokenLevel = currentAssumptions.size();
+                argument.emplace_back(
+                        StatementType::CONCLUSION,
+                        forEach->getProposition()->replaceSingularTerm(nextSingularTerm, true),
+                        currentAssumptions.size(),
+                        Rule::NONE,
+                        std::vector<size_t>{i}
+                );
+                singularTerms.insert(nextSingularTerm);
                 isChanged = true;
             }
         }

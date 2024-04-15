@@ -20,9 +20,12 @@ struct Statement {
 
     const std::vector<size_t> references;
     bool blocked {false};
-    bool assumptionCompleted{false};
     size_t brokenLevel{0};
     bool unused{false};
+
+    /**
+     * True when this statement is part of a completed assumption and should be skipped
+     */
     bool skip{false};
 
     [[nodiscard]] std::string getString() const;
