@@ -74,7 +74,7 @@ void print(const std::vector<Statement> &proof) {
                           << adjustedIndex[statement.references[1]] << " contradicts "
                           << adjustedIndex[statement.references[2]] << ") ";
             } else if (!statement.references.empty()) {
-                std::cout << "(from " << statement.references[0];
+                std::cout << "(from " << adjustedIndex[statement.references[0]];
                 for (auto reference = statement.references.begin() + 1;
                      reference != statement.references.end(); reference++) {
                     std::cout << ", " << adjustedIndex[*reference];

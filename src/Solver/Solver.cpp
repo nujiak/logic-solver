@@ -235,17 +235,16 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
             // combine all singular terms used across all statements
             std::unordered_set<char> symbols{};
             for (const auto &statement: argument) {
-                if (!statement.skip) {
-                    const auto statementSymbols = statement.proposition->getSingularTerms();
-                    symbols.insert(statementSymbols.begin(), statementSymbols.end());
-                }
+                const auto statementSymbols = statement.proposition->getSingularTerms();
+                symbols.insert(statementSymbols.begin(), statementSymbols.end());
             }
+            symbols.erase('x');
             return symbols;
         }();
         char nextSingularTerm = 'a';
         for (size_t i = startAt; i < currentLength; i++) {
             Statement &statement = argument[i];
-            if (statement.brokenLevel > 0) {
+            if (statement.blocked || statement.brokenLevel > 0) {
                 continue;
             }
             if (const auto forEach = std::dynamic_pointer_cast<ForEach>(statement.proposition)) {
@@ -265,6 +264,33 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
                 );
                 singularTerms.insert(nextSingularTerm);
                 isChanged = true;
+            }
+        }
+
+        // Drop universals
+        currentLength = currentAssumptions.size();
+        for (size_t i = 0; i < currentLength; i++) {
+            argument.reserve(singularTerms.size());
+            Statement &statement = argument[i];
+            if (statement.blocked || statement.skip) {
+                continue;
+            }
+            const auto forAll = std::dynamic_pointer_cast<ForAll>(statement.proposition);
+            if (!forAll) {
+                continue;
+            }
+            for (const auto singularTerm: singularTerms) {
+                if (!statement.brokenSingularTerms.contains(singularTerm)) {
+                    statement.brokenSingularTerms.insert(singularTerm);
+                    argument.emplace_back(
+                            StatementType::CONCLUSION,
+                            forAll->getProposition()->replaceSingularTerm(singularTerm, true),
+                            currentAssumptions.size(),
+                            Rule::NONE,
+                            std::vector<size_t>{i}
+                    );
+                    isChanged = true;
+                }
             }
         }
 

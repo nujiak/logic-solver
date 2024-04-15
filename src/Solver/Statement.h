@@ -28,6 +28,8 @@ struct Statement {
      */
     bool skip{false};
 
+    std::unordered_set<char> brokenSingularTerms{};
+
     [[nodiscard]] std::string getString() const;
 };
 
