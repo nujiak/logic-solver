@@ -39,6 +39,12 @@ add_library(${PROJECT_NAME}_lib
         src/NotImplementedError.h
         src/Propositions/QuantifiedVariable.h
         src/Propositions/QuantifiedVariable.cpp
+        src/Propositions/Quantifiers/Quantifier.h
+        src/Propositions/Quantifiers/Quantifier.cpp
+        src/Propositions/Quantifiers/ForAll.h
+        src/Propositions/Quantifiers/ForAll.cpp
+        src/Propositions/Quantifiers/ForEach.h
+        src/Propositions/Quantifiers/ForEach.cpp
 )
 target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}_lib)
 
