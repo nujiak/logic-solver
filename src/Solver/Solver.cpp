@@ -5,6 +5,8 @@
 #include "Rules/IRules.h"
 #include "Rules/SRules.h"
 #include "Propositions/Variable.h"
+#include "Propositions/Quantifiers/ForAll.h"
+#include "Propositions/Quantifiers/ForEach.h"
 #include <stdexcept>
 
 struct InferredProposition {
@@ -195,7 +197,40 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
             canBreak = false;
         }
         isChanged = false;
+
+        // Handle quantification
+
+        // Reverse squiggles
         auto currentLength = argument.size();
+        for (size_t i = startAt; i < currentLength; i++) {
+            Statement &statement = argument[i];
+            if (statement.brokenLevel > 0) {
+                continue;
+            }
+            if (auto embeddedForAll = std::dynamic_pointer_cast<ForAll>(Negation::of(statement.proposition))) {
+                statement.brokenLevel = currentAssumptions.size();
+                argument.emplace_back(
+                        StatementType::CONCLUSION,
+                        std::make_shared<ForEach>(Negation::of(embeddedForAll->getProposition())),
+                        currentAssumptions.size(),
+                        Rule::NONE,
+                        std::vector<size_t>{i}
+                );
+                isChanged = true;
+            } else if (auto embeddedForEach = std::dynamic_pointer_cast<ForEach>(Negation::of(statement.proposition))) {
+                statement.brokenLevel = currentAssumptions.size();
+                argument.emplace_back(
+                        StatementType::CONCLUSION,
+                        std::make_shared<ForAll>(Negation::of(embeddedForEach->getProposition())),
+                        currentAssumptions.size(),
+                        Rule::NONE,
+                        std::vector<size_t>{i}
+                );
+                isChanged = true;
+            }
+        }
+
+        currentLength = argument.size();
         for (size_t i = 0; i < currentLength; i++) {
             // Reserve space on argument to prevent reallocation and reference invalidation
             // on adding s-rule and i-rule results
