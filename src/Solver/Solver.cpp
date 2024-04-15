@@ -306,7 +306,7 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
             // Break implication if no new statements were added last iteration
             if (lastIterationNoChange && leftStatement.brokenLevel == 0) {
                 if (auto brokenProposition = tryBreakComplexWff(leftStatement.proposition)) {
-                    leftStatement.brokenLevel = currentAssumptions.size();
+                    leftStatement.brokenLevel = currentAssumptions.size() + 1;
                     argument.emplace_back(StatementType::ASSUMPTION,
                                           brokenProposition,
                                           leftStatement.brokenLevel,
@@ -325,7 +325,7 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
                     argument.emplace_back(
                             StatementType::CONCLUSION,
                             result.proposition,
-                            leftStatement.assumptionLevel,
+                            currentAssumptions.size(),
                             result.rule,
                             std::vector<size_t>{i}
                     );
@@ -379,7 +379,7 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
                         argument.emplace_back(
                                 StatementType::CONCLUSION,
                                 proposition.proposition,
-                                rightStatement.assumptionLevel,
+                                currentAssumptions.size(),
                                 proposition.rule,
                                 std::vector<size_t>{i, j}
                         );
@@ -396,7 +396,7 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
                         argument.emplace_back(
                                 StatementType::CONCLUSION,
                                 proposition.proposition,
-                                rightStatement.assumptionLevel,
+                                currentAssumptions.size(),
                                 proposition.rule,
                                 std::vector<size_t>{i, j}
                         );

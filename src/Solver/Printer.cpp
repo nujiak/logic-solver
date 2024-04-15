@@ -49,7 +49,7 @@ void print(const std::vector<Statement> &proof) {
             adjustedIndex.push_back(i + 1 - runningBlockedCount);
         }
 
-        for (int j = 0 ; j < statement.assumptionLevel; j++) {
+        for (int j = 0 ; j < (statement.assumptionLevel <= 1 ? 0 : statement.assumptionLevel - 1); j++) {
             std::cout << "  ";
         }
         switch (statement.type) {
