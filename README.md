@@ -39,9 +39,9 @@ The following quantificational logic rules are currently implemented:
 2. Drop existential
 3. Drop universal
 
-## Compiling
+## Building
 
-`logic-solver` can be compiled using CMake.
+`logic-solver` can be built with CMake using gcc or MSVC.
 
 1. Clone the repository:
 
@@ -61,7 +61,7 @@ cmake --build build
 
 ## Usage
 
-`logic-solver` completes a proof by contradiction given an argument. An argument is a list of propositions where all
+`logic-solver` completes a proof/refutation by contradiction given an argument. An argument is a list of propositions where all
 propositions are taken as premises, except the last which is taken as a conclusion.
 
 The following symbols are used:
