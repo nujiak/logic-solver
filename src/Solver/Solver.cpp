@@ -169,6 +169,141 @@ std::shared_ptr<WellFormedFormula> tryBreakComplexWff(const std::shared_ptr<Well
     return {};
 }
 
+/**
+ * Performs reverse squiggles on any negated quantifiers
+ * @param startAt
+ * @param currentAssumptions
+ * @param argument
+ */
+void reverseSquiggles(const size_t startAt, const std::vector<std::pair<size_t, Statement>> &currentAssumptions,
+                      std::vector<Statement> &argument) {// Reverse squiggles
+    const size_t currentLength = argument.size();
+    for (size_t i = startAt; i < currentLength; i++) {
+        Statement &statement = argument[i];
+        if (statement.brokenLevel > 0) {
+            continue;
+        }
+        if (auto embeddedForAll = std::dynamic_pointer_cast<ForAll>(Negation::of(statement.proposition))) {
+            statement.brokenLevel = currentAssumptions.size();
+            argument.emplace_back(
+                    StatementType::CONCLUSION,
+                    std::make_shared<ForEach>(Negation::of(embeddedForAll->getProposition())),
+                    currentAssumptions.size(),
+                    Rule::NONE,
+                    std::vector<size_t>{i}
+            );
+        } else if (auto embeddedForEach = std::dynamic_pointer_cast<ForEach>(Negation::of(statement.proposition))) {
+            statement.brokenLevel = currentAssumptions.size();
+            argument.emplace_back(
+                    StatementType::CONCLUSION,
+                    std::make_shared<ForAll>(Negation::of(embeddedForEach->getProposition())),
+                    currentAssumptions.size(),
+                    Rule::NONE,
+                    std::vector<size_t>{i}
+            );
+        }
+    }
+}
+
+/**
+ * Performs drop existentials on any unbroken existential quantifiers
+ * @param startAt
+ * @param currentAssumptions
+ * @param argument
+ * @param singularTerms
+ */
+void dropExistentials(const size_t startAt, const std::vector<std::pair<size_t, Statement>> &currentAssumptions,
+                      std::vector<Statement> &argument,
+                      std::unordered_set<char> &singularTerms) {
+    const size_t currentLength = argument.size();
+    char nextSingularTerm = 'a';
+    for (size_t i = startAt; i < currentLength; i++) {
+        Statement &statement = argument[i];
+        if (statement.blocked || statement.skip || statement.brokenLevel > 0) {
+            continue;
+        }
+        if (const auto forEach = std::dynamic_pointer_cast<ForEach>(statement.proposition)) {
+            while (singularTerms.contains(nextSingularTerm) || nextSingularTerm == 'x') {
+                nextSingularTerm++;
+            }
+            if (nextSingularTerm > 'z') {
+                throw std::overflow_error("Singular terms exceeded z, argument may be too long");
+            }
+            statement.brokenLevel = currentAssumptions.size();
+            argument.emplace_back(
+                    StatementType::CONCLUSION,
+                    forEach->getProposition()->replaceSingularTerm(nextSingularTerm, true),
+                    currentAssumptions.size(),
+                    Rule::NONE,
+                    std::vector<size_t>{i}
+            );
+            singularTerms.insert(nextSingularTerm);
+        }
+    }
+}
+
+/**
+ * Performs drop universals on any universal quantifiers not broken with singular terms from a given set
+ * @param currentAssumptions
+ * @param argument
+ * @param singularTerms
+ */
+void
+dropUniversals(const std::vector<std::pair<size_t, Statement>> &currentAssumptions, std::vector<Statement> &argument,
+               const std::unordered_set<char> &singularTerms) {
+    const size_t currentLength = argument.size();
+    for (size_t i = 0; i < currentLength; i++) {
+        argument.reserve(singularTerms.size());
+        Statement &statement = argument[i];
+        if (statement.blocked || statement.skip) {
+            continue;
+        }
+        const auto forAll = std::dynamic_pointer_cast<ForAll>(statement.proposition);
+        if (!forAll) {
+            continue;
+        }
+        for (const auto singularTerm: singularTerms) {
+            if (!statement.brokenSingularTerms.contains(singularTerm)) {
+                statement.brokenSingularTerms.insert(singularTerm);
+                argument.emplace_back(
+                        StatementType::CONCLUSION,
+                        forAll->getProposition()->replaceSingularTerm(singularTerm, true),
+                        currentAssumptions.size(),
+                        Rule::NONE,
+                        std::vector<size_t>{i}
+                );
+            }
+        }
+    }
+}
+
+/**
+ * Performs reverse squiggles, drop existentials and drop universals
+ * @param startAt
+ * @param currentAssumptions
+ * @param argument
+ * @return true if new statements have been added
+ */
+bool handleQuantificationalStatements(size_t startAt,
+                                      const std::vector<std::pair<size_t, Statement>> &currentAssumptions,
+                                      std::vector<Statement> &argument) {
+    size_t initialNumStatements = argument.size();
+
+    reverseSquiggles(startAt, currentAssumptions, argument);
+
+    std::unordered_set<char> singularTerms{};
+    // combine all singular terms used across all statements
+    for (const auto &statement: argument) {
+        const auto statementSingularTerms = statement.proposition->getSingularTerms();
+        singularTerms.insert(statementSingularTerms.begin(), statementSingularTerms.end());
+    }
+    singularTerms.erase('x');
+
+    dropExistentials(startAt, currentAssumptions, argument, singularTerms);
+    dropUniversals(currentAssumptions, argument, singularTerms);
+    return argument.size() > initialNumStatements;
+}
+
 std::vector<Statement> solve(std::vector<Statement> argument) {
     bool isChanged = true;
     bool canBreak = true;
@@ -197,104 +332,9 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
         }
         isChanged = false;
 
-        // Handle quantification
+        isChanged |= handleQuantificationalStatements(startAt, currentAssumptions, argument);
 
-        // Reverse squiggles
-        auto currentLength = argument.size();
-        for (size_t i = startAt; i < currentLength; i++) {
-            Statement &statement = argument[i];
-            if (statement.brokenLevel > 0) {
-                continue;
-            }
-            if (auto embeddedForAll = std::dynamic_pointer_cast<ForAll>(Negation::of(statement.proposition))) {
-                statement.brokenLevel = currentAssumptions.size();
-                argument.emplace_back(
-                        StatementType::CONCLUSION,
-                        std::make_shared<ForEach>(Negation::of(embeddedForAll->getProposition())),
-                        currentAssumptions.size(),
-                        Rule::NONE,
-                        std::vector<size_t>{i}
-                );
-                isChanged = true;
-            } else if (auto embeddedForEach = std::dynamic_pointer_cast<ForEach>(Negation::of(statement.proposition))) {
-                statement.brokenLevel = currentAssumptions.size();
-                argument.emplace_back(
-                        StatementType::CONCLUSION,
-                        std::make_shared<ForAll>(Negation::of(embeddedForEach->getProposition())),
-                        currentAssumptions.size(),
-                        Rule::NONE,
-                        std::vector<size_t>{i}
-                );
-                isChanged = true;
-            }
-        }
-
-        // Drop existential
-        currentLength = argument.size();
-        std::unordered_set<char> singularTerms = [&argument, &currentAssumptions]() {
-            // combine all singular terms used across all statements
-            std::unordered_set<char> symbols{};
-            for (const auto &statement: argument) {
-                const auto statementSymbols = statement.proposition->getSingularTerms();
-                symbols.insert(statementSymbols.begin(), statementSymbols.end());
-            }
-            symbols.erase('x');
-            return symbols;
-        }();
-        char nextSingularTerm = 'a';
-        for (size_t i = startAt; i < currentLength; i++) {
-            Statement &statement = argument[i];
-            if (statement.blocked || statement.brokenLevel > 0) {
-                continue;
-            }
-            if (const auto forEach = std::dynamic_pointer_cast<ForEach>(statement.proposition)) {
-                while (singularTerms.contains(nextSingularTerm) || nextSingularTerm == 'x') {
-                    nextSingularTerm++;
-                }
-                if (nextSingularTerm > 'z') {
-                    throw std::overflow_error("Singular terms exceeded z, argument may be too long");
-                }
-                statement.brokenLevel = currentAssumptions.size();
-                argument.emplace_back(
-                        StatementType::CONCLUSION,
-                        forEach->getProposition()->replaceSingularTerm(nextSingularTerm, true),
-                        currentAssumptions.size(),
-                        Rule::NONE,
-                        std::vector<size_t>{i}
-                );
-                singularTerms.insert(nextSingularTerm);
-                isChanged = true;
-            }
-        }
-
-        // Drop universals
-        currentLength = argument.size();
-        for (size_t i = 0; i < currentLength; i++) {
-            argument.reserve(singularTerms.size());
-            Statement &statement = argument[i];
-            if (statement.blocked || statement.skip) {
-                continue;
-            }
-            const auto forAll = std::dynamic_pointer_cast<ForAll>(statement.proposition);
-            if (!forAll) {
-                continue;
-            }
-            for (const auto singularTerm: singularTerms) {
-                if (!statement.brokenSingularTerms.contains(singularTerm)) {
-                    statement.brokenSingularTerms.insert(singularTerm);
-                    argument.emplace_back(
-                            StatementType::CONCLUSION,
-                            forAll->getProposition()->replaceSingularTerm(singularTerm, true),
-                            currentAssumptions.size(),
-                            Rule::NONE,
-                            std::vector<size_t>{i}
-                    );
-                    isChanged = true;
-                }
-            }
-        }
-
-        currentLength = argument.size();
+        unsigned long currentLength = argument.size();
         for (size_t i = 0; i < currentLength; i++) {
             // Reserve space on argument to prevent reallocation and reference invalidation
             // on adding s-rule and i-rule results
