@@ -2,7 +2,7 @@
 
 ## Introduction
 
-`logic-solver` proves logical arguments using methods
+`logic-solver` proves or refutes propositional and quantificational logic arguments using methods
 from [Introduction to logic](https://archive.org/details/introductiontolo0003gens_k7f4/page/424/mode/2up), as taught
 in [GET1028/GEX1014 Logic](https://nusmods.com/courses/GET1028/logic).
 
@@ -28,6 +28,12 @@ The following techniques are currently implemented:
 2. Harder proofs (by breaking implications, conjunctions, and disjunctions)
 3. Easier refutations
 4. Harder refutations (by breaking implications, conjunctions, and disjunctions)
+
+The following quantificational logic rules are currently implemented:
+
+1. Drop squiggle
+2. Drop existential
+3. Drop universal
 
 ## Compiling
 
