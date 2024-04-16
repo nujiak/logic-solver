@@ -49,7 +49,7 @@ void print(const std::vector<Statement> &proof) {
         if (statement.blocked) {
             std::cout << " | ";
             runningBlockedCount++;
-            adjustedIndex.push_back(i);
+            adjustedIndex.push_back(0);
         } else {
             std::cout << (i + 1 - runningBlockedCount) << ". ";
             adjustedIndex.push_back(i + 1 - runningBlockedCount);
@@ -79,7 +79,7 @@ void print(const std::vector<Statement> &proof) {
                 std::cout << "(from " << adjustedIndex[statement.references[0]] << "; "
                           << adjustedIndex[statement.references[1]] << " contradicts "
                           << adjustedIndex[statement.references[2]] << ") ";
-            } else if (!statement.references.empty()) {
+            } else if (!statement.references.empty() && adjustedIndex[statement.references[0]] != 0) {
                 std::cout << "(from " << adjustedIndex[statement.references[0]];
                 for (auto reference = statement.references.begin() + 1;
                      reference != statement.references.end(); reference++) {
