@@ -15,7 +15,10 @@ enum class Rule {
     MT,
     IFF,
     NIFF,
-    BREAK
+    BREAK,
+    RS,
+    DE,
+    DU
 };
 
 

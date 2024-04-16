@@ -189,7 +189,7 @@ void reverseSquiggles(const size_t startAt, const std::vector<std::pair<size_t, 
                     StatementType::CONCLUSION,
                     std::make_shared<ForEach>(Negation::of(embeddedForAll->getProposition())),
                     currentAssumptions.size(),
-                    Rule::NONE,
+                    Rule::RS,
                     std::vector<size_t>{i}
             );
         } else if (auto embeddedForEach = std::dynamic_pointer_cast<ForEach>(Negation::of(statement.proposition))) {
@@ -198,7 +198,7 @@ void reverseSquiggles(const size_t startAt, const std::vector<std::pair<size_t, 
                     StatementType::CONCLUSION,
                     std::make_shared<ForAll>(Negation::of(embeddedForEach->getProposition())),
                     currentAssumptions.size(),
-                    Rule::NONE,
+                    Rule::RS,
                     std::vector<size_t>{i}
             );
         }
@@ -234,7 +234,7 @@ void dropExistentials(const size_t startAt, const std::vector<std::pair<size_t, 
                     StatementType::CONCLUSION,
                     forEach->getProposition()->replaceSingularTerm(nextSingularTerm, true),
                     currentAssumptions.size(),
-                    Rule::NONE,
+                    Rule::DE,
                     std::vector<size_t>{i}
             );
             singularTerms.insert(nextSingularTerm);
@@ -269,7 +269,7 @@ dropUniversals(const std::vector<std::pair<size_t, Statement>> &currentAssumptio
                         StatementType::CONCLUSION,
                         forAll->getProposition()->replaceSingularTerm(singularTerm, true),
                         currentAssumptions.size(),
-                        Rule::NONE,
+                        Rule::DU,
                         std::vector<size_t>{i}
                 );
             }

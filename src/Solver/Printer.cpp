@@ -26,6 +26,12 @@ std::string getRuleString(const Rule& rule) {
             return "IFF";
         case Rule::NIFF:
             return "NIFF";
+        case Rule::RS:
+            return "RS";
+        case Rule::DE:
+            return "DE";
+        case Rule::DU:
+            return "DU";
         case Rule::NONE:
             return "";
         default:
