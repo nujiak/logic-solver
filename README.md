@@ -66,15 +66,15 @@ propositions are taken as premises, except the last which is taken as a conclusi
 
 The following symbols are used:
 
-| Logical operator       | Symbol |
-|------------------------|--------|
-| Conjunction            | &      |
-| Disjunction            | @      |
-| Implication            | \>     |
-| Equivalence            | =      |
-| Negation               | ~      |
-| Universal quantifier   | (!x)   |
-| Existential quantifier | (x)    |
+| Logical operator                                                                   | Symbol |
+|------------------------------------------------------------------------------------|--------|
+| [Conjunction](https://en.wikipedia.org/wiki/Logical_conjunction)                   | &      |
+| [Disjunction](https://en.wikipedia.org/wiki/Logical_disjunction)                   | @      |
+| [Implication](https://en.wikipedia.org/wiki/Material_conditional)                  | \>     |
+| [Equivalence](https://en.wikipedia.org/wiki/Logical_biconditional)                 | =      |
+| [Negation](https://en.wikipedia.org/wiki/Negation)                                 | ~      |
+| [Universal quantifier](https://en.wikipedia.org/wiki/Universal_quantification)     | (!x)   |
+| [Existential quantifier](https://en.wikipedia.org/wiki/Existential_quantification) | (x)    |
 
 First, write the argument into a text file, using the symbols above. For example:
 
