@@ -1,6 +1,8 @@
 # logic-solver
 
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/nujiak/logic-solver/cmake-multi-platform.yml?label=tests)
+<a href="https://github.com/nujiak/logic-solver/actions/workflows/cmake-multi-platform.yml">
+  <img src="https://img.shields.io/github/actions/workflow/status/nujiak/logic-solver/cmake-multi-platform.yml?label=tests" alt="GitHub Actions workflow status">
+</a>
 
 ## Introduction
 
