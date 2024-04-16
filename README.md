@@ -1,4 +1,6 @@
-# logic-solver
+# logic-solver!
+
+[GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/nujiak/logic-solver/cmake-multi-platform.yml?label=tests)
 
 ## Introduction
 
