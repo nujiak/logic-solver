@@ -35,7 +35,7 @@ The following techniques are currently implemented:
 
 The following quantificational logic rules are currently implemented:
 
-1. Drop squiggle
+1. Reverse squiggle
 2. Drop existential
 3. Drop universal
 
