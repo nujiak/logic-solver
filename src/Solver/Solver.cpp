@@ -92,18 +92,18 @@ std::vector<Statement> simplifyProof(std::vector<Statement> &proof, bool isProof
     if (isProof) {
         frontier.push_back(proof.size() - 1);
     } else {
-        std::unordered_set<char> foundVariables;
+        std::unordered_set<std::string> foundVariables;
         for (size_t i = proof.size() - 1; i < proof.size(); i--) {
             const auto& statement = proof[i];
             if (auto variable = std::dynamic_pointer_cast<Variable>(statement.proposition)) {
-                if (!foundVariables.contains(variable->getName())) {
-                    foundVariables.insert(variable->getName());
+                if (!foundVariables.contains(variable->getString())) {
+                    foundVariables.insert(variable->getString());
                     frontier.push_back(i);
                 }
             } else if (auto negatedVariable = std::dynamic_pointer_cast<Variable>(
                     Negation::of(statement.proposition))) {
-                if (!foundVariables.contains(negatedVariable->getName())) {
-                    foundVariables.insert(negatedVariable->getName());
+                if (!foundVariables.contains(negatedVariable->getString())) {
+                    foundVariables.insert(negatedVariable->getString());
                     frontier.push_back(i);
                 }
             }
