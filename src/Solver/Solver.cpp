@@ -5,6 +5,8 @@
 #include "Rules/IRules.h"
 #include "Rules/SRules.h"
 #include "Propositions/Variable.h"
+#include "Propositions/Quantifiers/ForAll.h"
+#include "Propositions/Quantifiers/ForEach.h"
 #include <stdexcept>
 
 struct InferredProposition {
@@ -90,18 +92,18 @@ std::vector<Statement> simplifyProof(std::vector<Statement> &proof, bool isProof
     if (isProof) {
         frontier.push_back(proof.size() - 1);
     } else {
-        std::unordered_set<char> foundVariables;
+        std::unordered_set<std::string> foundVariables;
         for (size_t i = proof.size() - 1; i < proof.size(); i--) {
             const auto& statement = proof[i];
             if (auto variable = std::dynamic_pointer_cast<Variable>(statement.proposition)) {
-                if (!foundVariables.contains(variable->getName())) {
-                    foundVariables.insert(variable->getName());
+                if (!foundVariables.contains(variable->getString())) {
+                    foundVariables.insert(variable->getString());
                     frontier.push_back(i);
                 }
             } else if (auto negatedVariable = std::dynamic_pointer_cast<Variable>(
                     Negation::of(statement.proposition))) {
-                if (!foundVariables.contains(negatedVariable->getName())) {
-                    foundVariables.insert(negatedVariable->getName());
+                if (!foundVariables.contains(negatedVariable->getString())) {
+                    foundVariables.insert(negatedVariable->getString());
                     frontier.push_back(i);
                 }
             }
@@ -142,7 +144,6 @@ std::vector<Statement> simplifyProof(std::vector<Statement> &proof, bool isProof
                 statement.rule,
                 adjustedReferences,
                 statement.blocked,
-                statement.assumptionCompleted,
                 statement.brokenLevel,
                 statement.unused,
                 statement.skip,
@@ -166,6 +167,141 @@ std::shared_ptr<WellFormedFormula> tryBreakComplexWff(const std::shared_ptr<Well
     }
 
     return {};
+}
+
+/**
+ * Performs reverse squiggles on any negated quantifiers
+ * @param startAt
+ * @param currentAssumptions
+ * @param argument
+ */
+void reverseSquiggles(const size_t startAt, const std::vector<std::pair<size_t, Statement>> &currentAssumptions,
+                      std::vector<Statement> &argument) {// Reverse squiggles
+    const size_t currentLength = argument.size();
+    for (size_t i = startAt; i < currentLength; i++) {
+        Statement &statement = argument[i];
+        if (statement.brokenLevel > 0) {
+            continue;
+        }
+        if (auto embeddedForAll = std::dynamic_pointer_cast<ForAll>(Negation::of(statement.proposition))) {
+            statement.brokenLevel = currentAssumptions.size();
+            argument.emplace_back(
+                    StatementType::CONCLUSION,
+                    std::make_shared<ForEach>(Negation::of(embeddedForAll->getProposition())),
+                    currentAssumptions.size(),
+                    Rule::RS,
+                    std::vector<size_t>{i}
+            );
+        } else if (auto embeddedForEach = std::dynamic_pointer_cast<ForEach>(Negation::of(statement.proposition))) {
+            statement.brokenLevel = currentAssumptions.size();
+            argument.emplace_back(
+                    StatementType::CONCLUSION,
+                    std::make_shared<ForAll>(Negation::of(embeddedForEach->getProposition())),
+                    currentAssumptions.size(),
+                    Rule::RS,
+                    std::vector<size_t>{i}
+            );
+        }
+    }
+}
+
+/**
+ * Performs drop existentials on any unbroken existential quantifiers
+ * @param startAt
+ * @param currentAssumptions
+ * @param argument
+ * @param singularTerms
+ */
+void dropExistentials(const size_t startAt, const std::vector<std::pair<size_t, Statement>> &currentAssumptions,
+                      std::vector<Statement> &argument,
+                      std::unordered_set<char> &singularTerms) {
+    const size_t currentLength = argument.size();
+    char nextSingularTerm = 'a';
+    for (size_t i = startAt; i < currentLength; i++) {
+        Statement &statement = argument[i];
+        if (statement.blocked || statement.skip || statement.brokenLevel > 0) {
+            continue;
+        }
+        if (const auto forEach = std::dynamic_pointer_cast<ForEach>(statement.proposition)) {
+            while (singularTerms.contains(nextSingularTerm) || nextSingularTerm == 'x') {
+                nextSingularTerm++;
+            }
+            if (nextSingularTerm > 'z') {
+                throw std::overflow_error("Singular terms exceeded z, argument may be too long");
+            }
+            statement.brokenLevel = currentAssumptions.size();
+            argument.emplace_back(
+                    StatementType::CONCLUSION,
+                    forEach->getProposition()->replaceSingularTerm(nextSingularTerm, true),
+                    currentAssumptions.size(),
+                    Rule::DE,
+                    std::vector<size_t>{i}
+            );
+            singularTerms.insert(nextSingularTerm);
+        }
+    }
+}
+
+/**
+ * Performs drop universals on any universal quantifiers not broken with singular terms from a given set
+ * @param currentAssumptions
+ * @param argument
+ * @param singularTerms
+ */
+void
+dropUniversals(const std::vector<std::pair<size_t, Statement>> &currentAssumptions, std::vector<Statement> &argument,
+               const std::unordered_set<char> &singularTerms) {
+    const size_t currentLength = argument.size();
+    for (size_t i = 0; i < currentLength; i++) {
+        argument.reserve(singularTerms.size());
+        Statement &statement = argument[i];
+        if (statement.blocked || statement.skip) {
+            continue;
+        }
+        const auto forAll = std::dynamic_pointer_cast<ForAll>(statement.proposition);
+        if (!forAll) {
+            continue;
+        }
+        for (const auto singularTerm: singularTerms) {
+            if (!statement.brokenSingularTerms.contains(singularTerm)) {
+                statement.brokenSingularTerms.insert(singularTerm);
+                argument.emplace_back(
+                        StatementType::CONCLUSION,
+                        forAll->getProposition()->replaceSingularTerm(singularTerm, true),
+                        currentAssumptions.size(),
+                        Rule::DU,
+                        std::vector<size_t>{i}
+                );
+            }
+        }
+    }
+}
+
+/**
+ * Performs reverse squiggles, drop existentials and drop universals
+ * @param startAt
+ * @param currentAssumptions
+ * @param argument
+ * @return true if new statements have been added
+ */
+bool handleQuantificationalStatements(size_t startAt,
+                                      const std::vector<std::pair<size_t, Statement>> &currentAssumptions,
+                                      std::vector<Statement> &argument) {
+    size_t initialNumStatements = argument.size();
+
+    reverseSquiggles(startAt, currentAssumptions, argument);
+
+    std::unordered_set<char> singularTerms{};
+    // combine all singular terms used across all statements
+    for (const auto &statement: argument) {
+        const auto statementSingularTerms = statement.proposition->getSingularTerms();
+        singularTerms.insert(statementSingularTerms.begin(), statementSingularTerms.end());
+    }
+    singularTerms.erase('x');
+
+    dropExistentials(startAt, currentAssumptions, argument, singularTerms);
+    dropUniversals(currentAssumptions, argument, singularTerms);
+    return argument.size() > initialNumStatements;
 }
 
 std::vector<Statement> solve(std::vector<Statement> argument) {
@@ -195,7 +331,10 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
             canBreak = false;
         }
         isChanged = false;
-        auto currentLength = argument.size();
+
+        isChanged |= handleQuantificationalStatements(startAt, currentAssumptions, argument);
+
+        unsigned long currentLength = argument.size();
         for (size_t i = 0; i < currentLength; i++) {
             // Reserve space on argument to prevent reallocation and reference invalidation
             // on adding s-rule and i-rule results
@@ -207,7 +346,7 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
             // Break implication if no new statements were added last iteration
             if (lastIterationNoChange && leftStatement.brokenLevel == 0) {
                 if (auto brokenProposition = tryBreakComplexWff(leftStatement.proposition)) {
-                    leftStatement.brokenLevel = currentAssumptions.size();
+                    leftStatement.brokenLevel = currentAssumptions.size() + 1;
                     argument.emplace_back(StatementType::ASSUMPTION,
                                           brokenProposition,
                                           leftStatement.brokenLevel,
@@ -226,7 +365,7 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
                     argument.emplace_back(
                             StatementType::CONCLUSION,
                             result.proposition,
-                            leftStatement.assumptionLevel,
+                            currentAssumptions.size(),
                             result.rule,
                             std::vector<size_t>{i}
                     );
@@ -280,7 +419,7 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
                         argument.emplace_back(
                                 StatementType::CONCLUSION,
                                 proposition.proposition,
-                                rightStatement.assumptionLevel,
+                                currentAssumptions.size(),
                                 proposition.rule,
                                 std::vector<size_t>{i, j}
                         );
@@ -297,7 +436,7 @@ std::vector<Statement> solve(std::vector<Statement> argument) {
                         argument.emplace_back(
                                 StatementType::CONCLUSION,
                                 proposition.proposition,
-                                rightStatement.assumptionLevel,
+                                currentAssumptions.size(),
                                 proposition.rule,
                                 std::vector<size_t>{i, j}
                         );

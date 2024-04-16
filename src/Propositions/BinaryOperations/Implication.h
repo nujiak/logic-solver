@@ -13,6 +13,8 @@ public:
     [[nodiscard]] std::string getString() const override;
 
     [[nodiscard]] bool operator==(const std::shared_ptr<WellFormedFormula> &other) const override;
+
+    [[nodiscard]] std::shared_ptr<WellFormedFormula> replaceSingularTerm(char to, bool isTopLevel) const override;
 };
 
 

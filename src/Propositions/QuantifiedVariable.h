@@ -1,17 +1,13 @@
-#ifndef LOGIC_SOLVER_VARIABLE_H
-#define LOGIC_SOLVER_VARIABLE_H
+#ifndef LOGIC_SOLVER_QUANTIFIEDVARIABLE_H
+#define LOGIC_SOLVER_QUANTIFIEDVARIABLE_H
 
-#include "WellFormedFormula.h"
-#include <string>
-#include <utility>
+#include "Variable.h"
 
-class Variable : public WellFormedFormula {
-protected:
-    const char name;
+class QuantifiedVariable : public Variable {
+private:
+    const char singularTerm;
 public:
-    explicit Variable(char name) : name(name) {};
-
-    [[nodiscard]] char getName() const;
+    QuantifiedVariable(char name, char singularTerm) : Variable(name), singularTerm(singularTerm) {}
 
     [[nodiscard]] std::string getString() const override;
 
@@ -22,5 +18,4 @@ public:
     [[nodiscard]] std::unordered_set<char> getSingularTerms() const override;
 };
 
-
-#endif //LOGIC_SOLVER_VARIABLE_H
+#endif //LOGIC_SOLVER_QUANTIFIEDVARIABLE_H

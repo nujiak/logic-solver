@@ -26,7 +26,4 @@ TEST(VariableTest, CorrectInequalityCheck) {
 TEST(VariableTest, ReturnsCorrectString) {
     Variable A{'A'};
     EXPECT_EQ(A.getString(), "A");
-
-    Variable z{'z'};
-    EXPECT_EQ(z.getString(), "z");
 }

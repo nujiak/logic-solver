@@ -18,6 +18,8 @@ public:
     [[nodiscard]] std::shared_ptr<WellFormedFormula> getLeftOperand() const;
 
     [[nodiscard]] std::shared_ptr<WellFormedFormula> getRightOperand() const;
+
+    [[nodiscard]] std::unordered_set<char> getSingularTerms() const override;
 };
 
 

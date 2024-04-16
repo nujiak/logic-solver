@@ -26,6 +26,12 @@ std::string getRuleString(const Rule& rule) {
             return "IFF";
         case Rule::NIFF:
             return "NIFF";
+        case Rule::RS:
+            return "RS";
+        case Rule::DE:
+            return "DE";
+        case Rule::DU:
+            return "DU";
         case Rule::NONE:
             return "";
         default:
@@ -43,13 +49,13 @@ void print(const std::vector<Statement> &proof) {
         if (statement.blocked) {
             std::cout << " | ";
             runningBlockedCount++;
-            adjustedIndex.push_back(i);
+            adjustedIndex.push_back(0);
         } else {
             std::cout << (i + 1 - runningBlockedCount) << ". ";
             adjustedIndex.push_back(i + 1 - runningBlockedCount);
         }
 
-        for (int j = 0 ; j < statement.assumptionLevel; j++) {
+        for (int j = 0 ; j < (statement.assumptionLevel <= 1 ? 0 : statement.assumptionLevel - 1); j++) {
             std::cout << "  ";
         }
         switch (statement.type) {
@@ -73,8 +79,8 @@ void print(const std::vector<Statement> &proof) {
                 std::cout << "(from " << adjustedIndex[statement.references[0]] << "; "
                           << adjustedIndex[statement.references[1]] << " contradicts "
                           << adjustedIndex[statement.references[2]] << ") ";
-            } else if (!statement.references.empty()) {
-                std::cout << "(from " << statement.references[0];
+            } else if (!statement.references.empty() && adjustedIndex[statement.references[0]] != 0) {
+                std::cout << "(from " << adjustedIndex[statement.references[0]];
                 for (auto reference = statement.references.begin() + 1;
                      reference != statement.references.end(); reference++) {
                     std::cout << ", " << adjustedIndex[*reference];
