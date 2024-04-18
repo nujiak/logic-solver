@@ -3,13 +3,15 @@
 #include "Propositions/Variable.h"
 
 TEST(ImplicationTest, CorrectEqualityCheck) {
-    auto A = std::make_shared<Variable>('A');
-    auto B = std::make_shared<Variable>('B');
+    auto A1 = std::make_shared<Variable>('A');
+    auto A2 = std::make_shared<Variable>('A');
+    auto B1 = std::make_shared<Variable>('B');
+    auto B2 = std::make_shared<Variable>('B');
     auto C = std::make_shared<Variable>('C');
-    auto implication1 = std::make_shared<Implication>(A, B);
-    auto implication2 = std::make_shared<Implication>(A, B);
-    auto implication3 = std::make_shared<Implication>(B, A);
-    auto implication4 = std::make_shared<Implication>(A, C);
+    auto implication1 = std::make_shared<Implication>(A1, B1);
+    auto implication2 = std::make_shared<Implication>(A2, B2);
+    auto implication3 = std::make_shared<Implication>(B1, A1);
+    auto implication4 = std::make_shared<Implication>(A1, C);
 
     ASSERT_TRUE((*implication1) == implication2);
     ASSERT_FALSE((*implication1) == implication3);
@@ -17,13 +19,15 @@ TEST(ImplicationTest, CorrectEqualityCheck) {
 }
 
 TEST(ImplicationTest, CorrectInequalityCheck) {
-    auto A = std::make_shared<Variable>('A');
-    auto B = std::make_shared<Variable>('B');
+    auto A1 = std::make_shared<Variable>('A');
+    auto A2 = std::make_shared<Variable>('A');
+    auto B1 = std::make_shared<Variable>('B');
+    auto B2 = std::make_shared<Variable>('B');
     auto C = std::make_shared<Variable>('C');
-    auto implication1 = std::make_shared<Implication>(A, B);
-    auto implication2 = std::make_shared<Implication>(A, B);
-    auto implication3 = std::make_shared<Implication>(B, A);
-    auto implication4 = std::make_shared<Implication>(A, C);
+    auto implication1 = std::make_shared<Implication>(A1, B1);
+    auto implication2 = std::make_shared<Implication>(A2, B2);
+    auto implication3 = std::make_shared<Implication>(B1, A1);
+    auto implication4 = std::make_shared<Implication>(A1, C);
 
     ASSERT_FALSE((*implication1) != implication2);
     ASSERT_TRUE((*implication1) != implication3);
