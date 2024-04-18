@@ -3,13 +3,15 @@
 #include "Propositions/BinaryOperations/Disjunction.h"
 
 TEST(DisjunctionTest, CorrectEqualityCheck) {
-    auto A = std::make_shared<Variable>('A');
-    auto B = std::make_shared<Variable>('B');
+    auto A1 = std::make_shared<Variable>('A');
+    auto A2 = std::make_shared<Variable>('A');
+    auto B1 = std::make_shared<Variable>('B');
+    auto B2 = std::make_shared<Variable>('B');
     auto C = std::make_shared<Variable>('C');
-    auto disjunction1 = std::make_shared<Disjunction>(A, B);
-    auto disjunction2 = std::make_shared<Disjunction>(A, B);
-    auto disjunction3 = std::make_shared<Disjunction>(B, A);
-    auto disjunction4 = std::make_shared<Disjunction>(A, C);
+    auto disjunction1 = std::make_shared<Disjunction>(A1, B1);
+    auto disjunction2 = std::make_shared<Disjunction>(A2, B2);
+    auto disjunction3 = std::make_shared<Disjunction>(B1, A1);
+    auto disjunction4 = std::make_shared<Disjunction>(A1, C);
 
     ASSERT_TRUE((*disjunction1) == disjunction2);
     ASSERT_TRUE((*disjunction1) == disjunction3);
@@ -17,13 +19,15 @@ TEST(DisjunctionTest, CorrectEqualityCheck) {
 }
 
 TEST(DisjunctionTest, CorrectInequalityCheck) {
-    auto A = std::make_shared<Variable>('A');
-    auto B = std::make_shared<Variable>('B');
+    auto A1 = std::make_shared<Variable>('A');
+    auto A2 = std::make_shared<Variable>('A');
+    auto B1 = std::make_shared<Variable>('B');
+    auto B2 = std::make_shared<Variable>('B');
     auto C = std::make_shared<Variable>('C');
-    auto disjunction1 = std::make_shared<Disjunction>(A, B);
-    auto disjunction2 = std::make_shared<Disjunction>(A, B);
-    auto disjunction3 = std::make_shared<Disjunction>(B, A);
-    auto disjunction4 = std::make_shared<Disjunction>(A, C);
+    auto disjunction1 = std::make_shared<Disjunction>(A1, B1);
+    auto disjunction2 = std::make_shared<Disjunction>(A2, B2);
+    auto disjunction3 = std::make_shared<Disjunction>(B1, A1);
+    auto disjunction4 = std::make_shared<Disjunction>(A1, C);
 
     ASSERT_FALSE((*disjunction1) != disjunction2);
     ASSERT_FALSE((*disjunction1) != disjunction3);

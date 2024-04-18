@@ -6,10 +6,10 @@ std::string Conjunction::getString() const {
 
 bool Conjunction::operator==(const std::shared_ptr<WellFormedFormula> &other) const {
     if (auto otherConjunction = std::dynamic_pointer_cast<Conjunction>(other)) {
-        return ((this->leftOperand == otherConjunction->leftOperand) &&
-                (this->rightOperand == otherConjunction->rightOperand)) ||
-               ((this->leftOperand == otherConjunction->rightOperand) &&
-                (this->rightOperand == otherConjunction->leftOperand));
+        return ((*this->leftOperand == otherConjunction->leftOperand) &&
+                (*this->rightOperand == otherConjunction->rightOperand)) ||
+               ((*this->leftOperand == otherConjunction->rightOperand) &&
+                (*this->rightOperand == otherConjunction->leftOperand));
     }
     return false;
 }

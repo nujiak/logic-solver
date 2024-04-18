@@ -3,13 +3,15 @@
 #include "Propositions/Variable.h"
 
 TEST(EquivalenceTest, CorrectEqualityCheck) {
-    auto A = std::make_shared<Variable>('A');
-    auto B = std::make_shared<Variable>('B');
+    auto A1 = std::make_shared<Variable>('A');
+    auto A2 = std::make_shared<Variable>('A');
+    auto B1 = std::make_shared<Variable>('B');
+    auto B2 = std::make_shared<Variable>('B');
     auto C = std::make_shared<Variable>('C');
-    auto equivalence1 = std::make_shared<Equivalence>(A, B);
-    auto equivalence2 = std::make_shared<Equivalence>(A, B);
-    auto equivalence3 = std::make_shared<Equivalence>(B, A);
-    auto equivalence4 = std::make_shared<Equivalence>(A, C);
+    auto equivalence1 = std::make_shared<Equivalence>(A1, B1);
+    auto equivalence2 = std::make_shared<Equivalence>(A2, B2);
+    auto equivalence3 = std::make_shared<Equivalence>(B1, A1);
+    auto equivalence4 = std::make_shared<Equivalence>(A1, C);
 
     ASSERT_TRUE((*equivalence1) == equivalence2);
     ASSERT_TRUE((*equivalence1) == equivalence3);
@@ -17,13 +19,15 @@ TEST(EquivalenceTest, CorrectEqualityCheck) {
 }
 
 TEST(EquivalenceTest, CorrectInequalityCheck) {
-    auto A = std::make_shared<Variable>('A');
-    auto B = std::make_shared<Variable>('B');
+    auto A1 = std::make_shared<Variable>('A');
+    auto A2 = std::make_shared<Variable>('A');
+    auto B1 = std::make_shared<Variable>('B');
+    auto B2 = std::make_shared<Variable>('B');
     auto C = std::make_shared<Variable>('C');
-    auto equivalence1 = std::make_shared<Equivalence>(A, B);
-    auto equivalence2 = std::make_shared<Equivalence>(A, B);
-    auto equivalence3 = std::make_shared<Equivalence>(B, A);
-    auto equivalence4 = std::make_shared<Equivalence>(A, C);
+    auto equivalence1 = std::make_shared<Equivalence>(A1, B1);
+    auto equivalence2 = std::make_shared<Equivalence>(A2, B2);
+    auto equivalence3 = std::make_shared<Equivalence>(B1, A1);
+    auto equivalence4 = std::make_shared<Equivalence>(A1, C);
 
     ASSERT_FALSE((*equivalence1) != equivalence2);
     ASSERT_FALSE((*equivalence1) != equivalence3);

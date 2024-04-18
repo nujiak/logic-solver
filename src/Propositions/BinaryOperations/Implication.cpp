@@ -6,8 +6,8 @@ std::string Implication::getString() const {
 
 bool Implication::operator==(const std::shared_ptr<WellFormedFormula> &other) const {
     if (auto otherImplication = std::dynamic_pointer_cast<Implication>(other)) {
-        return (this->leftOperand == otherImplication->leftOperand) &&
-               (this->rightOperand == otherImplication->rightOperand);
+        return (*this->leftOperand == otherImplication->leftOperand) &&
+               (*this->rightOperand == otherImplication->rightOperand);
     }
     return false;
 }
